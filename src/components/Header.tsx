@@ -63,7 +63,7 @@ const Header: React.FC = () => {
             </li>
             <li>
               <Link
-                href="/Cvisita"
+                href="/CVisita"
                 className="flex items-center space-x-2 hover:text-yellow-400 transition-colors"
               >
                 <FaIdCard size={24} className="text-white" />
