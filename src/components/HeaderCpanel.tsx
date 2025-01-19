@@ -1,14 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
 const HeaderCpanel: React.FC = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   return (
     <header className="flex justify-between items-center bg-blue-800 text-white p-4">

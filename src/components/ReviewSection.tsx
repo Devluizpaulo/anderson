@@ -1,15 +1,24 @@
 import { useEffect, useState } from 'react';
 import { db, collection, getDocs } from '../services/firebase';
 
+// Definindo o tipo para a avaliação
+interface Review {
+  nome: string;
+  estrelas: number;
+  feedback: string;
+  feedbackTipo: string;
+  status: string; // Considerando o status da avaliação
+}
+
 const ReviewSection: React.FC = () => {
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]); // Usando o tipo Review[]
 
   useEffect(() => {
     const fetchReviews = async () => {
       const reviewsCollection = collection(db, 'avaliacoes');
       const reviewsSnapshot = await getDocs(reviewsCollection);
       const reviewsList = reviewsSnapshot.docs
-        .map((doc) => doc.data())
+        .map((doc) => doc.data() as Review) // Agora tipado como Review
         .filter((review) => review.status === 'publicado'); // Filtrando avaliações publicadas
 
       setReviews(reviewsList);

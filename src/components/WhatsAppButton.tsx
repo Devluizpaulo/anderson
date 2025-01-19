@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaWhatsapp, FaSmile, FaMicrophone } from "react-icons/fa";
+import Image from "next/image"; // Importe o componente Image
 
 const WhatsAppButton: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -30,10 +31,13 @@ const WhatsAppButton: React.FC = () => {
           {/* Cabeçalho */}
           <div className="flex items-center bg-green-600 text-white rounded-t-lg p-3">
             <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden mr-3">
-              <img
+              {/* Substitua <img> por <Image /> */}
+              <Image
                 src="/perfil.png"
                 alt="Foto do Atendente"
                 className="w-full h-full object-cover"
+                width={40} // Defina a largura e altura
+                height={40}
               />
             </div>
             <div className="flex-1">

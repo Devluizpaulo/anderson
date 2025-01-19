@@ -15,11 +15,20 @@ import {
 } from "firebase/firestore";
 import { format } from "date-fns";
 
+// Definindo a interface para Avaliação
+interface Avaliacao {
+  id: string;
+  nome: string;
+  estrelas: number;
+  comentario: string;
+  status: string;
+  data: Timestamp;
+}
+
 const CPanel: React.FC = () => {
-  const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingPublish, setLoadingPublish] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState<boolean>(false);
 
   const fetchAvaliacoes = async (archived = false) => {
@@ -30,7 +39,7 @@ const CPanel: React.FC = () => {
       const avaliacoesList = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }));
+      })) as Avaliacao[];
       setAvaliacoes(avaliacoesList);
     } catch (error) {
       console.error("Erro ao buscar avaliações:", error);
@@ -58,7 +67,7 @@ const CPanel: React.FC = () => {
   const handleArchive = async (id: string) => {
     try {
       const avaliacaoRef = doc(db, "avaliacoes", id);
-      const avaliacaoDoc = await getDoc(avaliacaoRef); // Correção aqui: getDoc para obter documento único
+      const avaliacaoDoc = await getDoc(avaliacaoRef);
       const avaliacaoData = avaliacaoDoc.data();
 
       if (avaliacaoData) {
@@ -68,23 +77,6 @@ const CPanel: React.FC = () => {
       }
     } catch (error) {
       console.error("Erro ao arquivar avaliação:", error);
-    }
-  };
-
-  const handleEdit = (id: string) => {
-    setEditMode(id);
-  };
-
-  const handleSave = async (id: string, newComent: string) => {
-    try {
-      const avaliacaoRef = doc(db, "avaliacoes", id);
-      await updateDoc(avaliacaoRef, {
-        comentario: newComent,
-      });
-      setEditMode(null);
-      fetchAvaliacoes();
-    } catch (error) {
-      console.error("Erro ao salvar avaliação:", error);
     }
   };
 
@@ -164,12 +156,6 @@ const CPanel: React.FC = () => {
                             className="text-yellow-600 hover:text-yellow-700"
                           >
                             Arquivar
-                          </button>
-                          <button
-                            onClick={() => handleEdit(avaliacao.id)}
-                            className="text-green-600 hover:text-green-800"
-                          >
-                            Modificar
                           </button>
                         </div>
                       )}
