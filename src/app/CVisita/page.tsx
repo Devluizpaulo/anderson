@@ -47,44 +47,66 @@ const LinkNaBio: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-black via-gray-800 to-black p-8">
-      <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-8 text-center tracking-tight animate__animated animate__fadeIn">
-        Cartão de Visitas Virtual
-        <span className="block mt-2 text-sm sm:text-xl font-light text-gray-300">
-          Acesse todos os links e promoções!
-        </span>
+    <div
+      className="flex flex-col items-center justify-center min-h-screen p-8"
+      style={{
+        backgroundImage: "url('/image.jpg')", // Coloque o caminho correto para sua imagem
+        backgroundSize: "cover", // Ajusta a imagem para cobrir a tela
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat", // Evita repetição da imagem
+      }}
+    >
+      <h1 className="text-5xl sm:text-5xl font-semibold text-white mb-4">
+        Siga-me nas redes sociais
       </h1>
 
+
       {/* Links de redes sociais */}
-      <div className="flex flex-col items-center gap-6 mb-12 w-full sm:w-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8 w-full max-w-md">
         <a
           href="https://instagram.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-4 bg-white text-black py-3 px-6 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
+          className="flex items-center justify-center gap-4 bg-white text-black py-2 px-4 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
         >
-          <FaInstagram size={28} />
-          <span className="font-semibold">Instagram</span>
+          <FaInstagram size={24} />
+          <span className="font-semibold text-sm">Instagram</span>
         </a>
         <a
           href="https://facebook.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-4 bg-white text-black py-3 px-6 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
+          className="flex items-center justify-center gap-4 bg-white text-black py-2 px-4 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
         >
-          <FaFacebook size={28} />
-          <span className="font-semibold">Facebook</span>
+          <FaFacebook size={24} />
+          <span className="font-semibold text-sm">Facebook</span>
         </a>
         <a
           href="https://twitter.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-4 bg-white text-black py-3 px-6 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
+          className="flex items-center justify-center gap-4 bg-white text-black py-2 px-4 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
         >
-          <FaTwitter size={28} />
-          <span className="font-semibold">Twitter</span>
+          <FaTwitter size={24} />
+          <span className="font-semibold text-sm">Twitter</span>
         </a>
       </div>
+
+      {/* Card de Convite para Avaliação */}
+      {avaliacaoStep === 1 && (
+        <div className="bg-white p-6 rounded-xl shadow-2xl w-full sm:w-96 mb-12 text-center">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Como foi a sua experiência?</h2>
+          <p className="text-gray-600 mb-4">
+            Compartilhe sua opinião.
+          </p>
+          <button
+            onClick={handleNextStep}
+            className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg w-full sm:w-auto"
+          >
+            Avaliar Agora
+          </button>
+        </div>
+      )}
 
       {/* Exibição do alerta personalizado */}
       {showAlert && (
@@ -94,11 +116,9 @@ const LinkNaBio: React.FC = () => {
       )}
 
       {/* Formulário de Avaliação - Passo 1 */}
-      {avaliacaoStep === 1 && (
+      {avaliacaoStep === 2 && (
         <div className="bg-white p-8 rounded-xl shadow-2xl w-full sm:w-96 mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-            Avalie o Motorista
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Obrigado</h2>
           <input
             type="text"
             className="w-full p-3 mb-4 border border-gray-300 rounded-lg"
@@ -130,14 +150,12 @@ const LinkNaBio: React.FC = () => {
       )}
 
       {/* Formulário de Avaliação - Passo 2 */}
-      {avaliacaoStep === 2 && (
-        <div className="bg-white p-8 rounded-xl shadow-2xl w-full sm:w-96 mb-12">
-          <h2 className="text-2xl font-semibold text-black mb-4 text-center">
-            Seu Feedback
-          </h2>
+      {avaliacaoStep === 3 && (
+        <div className="bg-white p-8 rounded-xl shadow-2xl w-full sm:w-5/12 mb-12">
+          <h2 className="text-2xl font-semibold text-black mb-4 text-center">Seu Feedback</h2>
           <textarea
-            className="w-full p-3 mb-4 border text-black border-gray-300 rounded-lg"
-            placeholder="Deixe sua mensagem ao motorista"
+            className="w-full p-4 mb-4 border text-black border-gray-300 rounded-lg"
+            placeholder="Obrigado pela sua atenção! Deixe sua mensagem aqui. (Ela pode ser exibida em meu PERFIL.)"
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
           />
@@ -187,11 +205,9 @@ const LinkNaBio: React.FC = () => {
       )}
 
       {/* Formulário de Avaliação - Passo 3 (LGPD) */}
-      {avaliacaoStep === 3 && (
+      {avaliacaoStep === 4 && (
         <div className="bg-white p-8 rounded-xl shadow-2xl w-full sm:w-96 mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-            LGPD
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">IMPORTANTE</h2>
           <div className="flex items-center mb-4">
             <input
               type="checkbox"
@@ -199,8 +215,8 @@ const LinkNaBio: React.FC = () => {
               onChange={(e) => setLgpd(e.target.checked)}
               className="mr-2"
             />
-            <span className="text-sm text-gray-600">
-              Eu aceito a política de privacidade e concordo com o uso dos meus dados.
+            <span className="text-base text-justify text-gray-600">
+              Eu aceito a <span className="font-semibold text-gray-800">política de privacidade</span> e concordo com o uso da minha <span className="font-semibold text-gray-800">opinião</span> e o armazenamento dos meus dados, seguindo as normas da <span className="font-semibold text-gray-800">LGPD</span>.
             </span>
           </div>
           <button
