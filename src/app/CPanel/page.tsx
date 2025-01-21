@@ -1,46 +1,73 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { FaUser, FaCalendarAlt, FaClipboardList, FaTag, FaFileInvoice } from "react-icons/fa";
 import HeaderCpanel from "../../components/HeaderCpanel";
-import { db } from "../../services/firebase";
-import {
-  collection,
-  getDocs,
-  getDoc,
-  updateDoc,
-  doc,
-  setDoc,
-  deleteDoc,
-  Timestamp,
-} from "firebase/firestore";
-import { format } from "date-fns";
+import { fetchAvaliacoes, publishAvaliacao, archiveAvaliacao, Avaliacao } from "../../services/avaliacoes";
+import AvaliacaoCard from "../../components/AvaliacaoCard";
+import Recibo from "../../components/Recibo"; // Caminho correto para o componente
+import Cupons from "../../components/CuponsDesconto";
+import Agenda from "../../components/Agenda";
+import Clientes from "../../components/Clientes";
 
-// Definindo a interface para Avaliação
-interface Avaliacao {
-  id: string;
-  nome: string;
-  estrelas: number;
-  comentario: string;
-  status: string;
-  data: Timestamp;
-}
+// Definir as opções do menu como constantes
+const TABS = {
+  AVALIACOES: "avaliacoes",
+  AGENDA: "agenda",
+  CLIENTES: "clientes",
+  CUPONS: "cupons",
+  RECIBOS: "recibos",
+};
+
+// Sidebar component
+const Sidebar: React.FC<{ setActiveTab: (tab: string) => void }> = ({ setActiveTab }) => (
+  <div className="w-64 bg-gray-800 text-white flex flex-col p-4">
+    <h2 className="text-2xl font-semibold mb-4">Dashboard</h2>
+    <button
+      onClick={() => setActiveTab(TABS.AVALIACOES)}
+      className="flex items-center px-4 py-2 mb-2 bg-blue-600 rounded hover:bg-blue-700 w-full"
+    >
+      <FaClipboardList className="mr-2" /> Avaliações
+    </button>
+    <button
+      onClick={() => setActiveTab(TABS.AGENDA)}
+      className="flex items-center px-4 py-2 mb-2 bg-blue-600 rounded hover:bg-blue-700 w-full"
+    >
+      <FaCalendarAlt className="mr-2" /> Agenda
+    </button>
+    <button
+      onClick={() => setActiveTab(TABS.CLIENTES)}
+      className="flex items-center px-4 py-2 mb-2 bg-blue-600 rounded hover:bg-blue-700 w-full"
+    >
+      <FaUser className="mr-2" /> Clientes
+    </button>
+    <button
+      onClick={() => setActiveTab(TABS.CUPONS)}
+      className="flex items-center px-4 py-2 mb-2 bg-blue-600 rounded hover:bg-blue-700 w-full"
+    >
+      <FaTag className="mr-2" /> Cupons
+    </button>
+    <button
+      onClick={() => setActiveTab(TABS.RECIBOS)}
+      className="flex items-center px-4 py-2 mb-2 bg-blue-600 rounded hover:bg-blue-700 w-full"
+    >
+      <FaFileInvoice className="mr-2" /> Recibos
+    </button>
+  </div>
+);
 
 const CPanel: React.FC = () => {
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingPublish, setLoadingPublish] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>(TABS.AVALIACOES);
 
-  const fetchAvaliacoes = async (archived = false) => {
+  const loadAvaliacoes = async () => {
     setLoading(true);
     try {
-      const collectionName = archived ? "avaliacoes_archivadas" : "avaliacoes";
-      const querySnapshot = await getDocs(collection(db, collectionName));
-      const avaliacoesList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Avaliacao[];
-      setAvaliacoes(avaliacoesList);
+      const data = await fetchAvaliacoes(showArchived);
+      setAvaliacoes(data);
     } catch (error) {
       console.error("Erro ao buscar avaliações:", error);
     } finally {
@@ -51,120 +78,75 @@ const CPanel: React.FC = () => {
   const handlePublish = async (id: string) => {
     setLoadingPublish(id);
     try {
-      const avaliacaoRef = doc(db, "avaliacoes", id);
-      await updateDoc(avaliacaoRef, {
-        status: "publicado",
-        dataPublicacao: Timestamp.now(),
-      });
-      fetchAvaliacoes();
-    } catch (error) {
-      console.error("Erro ao publicar avaliação:", error);
+      await publishAvaliacao(id);
+      await loadAvaliacoes();
     } finally {
       setLoadingPublish(null);
     }
   };
 
   const handleArchive = async (id: string) => {
-    try {
-      const avaliacaoRef = doc(db, "avaliacoes", id);
-      const avaliacaoDoc = await getDoc(avaliacaoRef);
-      const avaliacaoData = avaliacaoDoc.data();
-
-      if (avaliacaoData) {
-        await setDoc(doc(db, "avaliacoes_archivadas", id), avaliacaoData);
-        await deleteDoc(avaliacaoRef);
-        fetchAvaliacoes();
-      }
-    } catch (error) {
-      console.error("Erro ao arquivar avaliação:", error);
-    }
+    await archiveAvaliacao(id);
+    await loadAvaliacoes();
   };
 
   useEffect(() => {
-    fetchAvaliacoes();
-  }, []);
+    loadAvaliacoes();
+  }, [showArchived]);
+
+  useEffect(() => {
+    loadAvaliacoes();
+  }, [activeTab, showArchived]); // Recarregar avaliações quando o tab ativo ou a visualização de arquivadas mudar
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case TABS.AVALIACOES:
+        return (
+          <div>
+            <button
+              onClick={() => setShowArchived((prev) => !prev)}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mb-6"
+            >
+              {showArchived ? "Ver Ativas" : "Ver Arquivadas"}
+            </button>
+            <section className="mt-8 grid gap-6">
+              {loading ? (
+                <p>Carregando avaliações...</p>
+              ) : (
+                avaliacoes.map((avaliacao) => (
+                  <AvaliacaoCard
+                    key={avaliacao.id}
+                    avaliacao={avaliacao}
+                    onPublish={() => handlePublish(avaliacao.id)}
+                    onArchive={() => handleArchive(avaliacao.id)}
+                    isLoading={loadingPublish === avaliacao.id}
+                    showArchived={showArchived}
+                  />
+                ))
+              )}
+            </section>
+          </div>
+        );
+      case TABS.AGENDA:
+        return <Agenda />;
+      case TABS.CLIENTES:
+        return <Clientes />;
+      case TABS.CUPONS:
+        return <Cupons />;
+      case TABS.RECIBOS:
+        return <Recibo />;
+      default:
+        return <div>Selecione uma opção para começar.</div>;
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col ml-0 lg:ml-64">
+      <Sidebar setActiveTab={setActiveTab} />
+      <div className="flex-1 flex flex-col">
         <HeaderCpanel />
         <main className="flex-1 p-6 overflow-y-auto">
-          <p className="mt-4 text-lg text-gray-600">Gerencie seu sistema de forma eficaz e intuitiva.</p>
-          <button
-            onClick={() => {
-              setShowArchived(!showArchived);
-              fetchAvaliacoes(!showArchived);
-            }}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
-          >
-            {showArchived ? "Voltar às Avaliações Ativas" : "Exibir Arquivadas"}
-          </button>
-          <section className="mt-8">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              {showArchived ? "Avaliações Arquivadas" : "Avaliações Ativas"}
-            </h2>
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-              {loading ? (
-                <p className="text-center text-gray-500">Carregando avaliações...</p>
-              ) : (
-                avaliacoes.map((avaliacao) => {
-                  const data = avaliacao.data instanceof Timestamp ? avaliacao.data : null;
-                  const formattedDate = data
-                    ? format(new Date(data.seconds * 1000), "dd/MM/yyyy HH:mm")
-                    : "Data não disponível";
-
-                  return (
-                    <div
-                      key={avaliacao.id}
-                      className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out transform hover:scale-105"
-                    >
-                      <p className="font-medium text-lg text-blue-600">{avaliacao.nome}</p>
-                      <div className="flex items-center mt-2">
-                        {Array.from({ length: avaliacao.estrelas }).map((_, i) => (
-                          <svg
-                            key={i}
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                            width="20"
-                            height="20"
-                            className="text-yellow-500"
-                          >
-                            <path d="M12 17.25l6.474 3.522-1.646-7.137 5.307-4.625-7.444-.104L12 .25 9.309 8.931 1.865 9.036l5.307 4.625-1.646 7.137L12 17.25z" />
-                          </svg>
-                        ))}
-                      </div>
-                      <p className="text-gray-600 mt-2">{avaliacao.comentario}</p>
-                      <p className="text-sm text-gray-500 mt-1">{formattedDate}</p>
-                      {!showArchived && (
-                        <div className="flex justify-between mt-4">
-                          {avaliacao.status === "publicado" ? (
-                            <span className="text-green-600">Publicado</span>
-                          ) : (
-                            <button
-                              onClick={() => handlePublish(avaliacao.id)}
-                              disabled={loadingPublish === avaliacao.id}
-                              className={`text-blue-600 hover:text-blue-800 ${
-                                loadingPublish === avaliacao.id && "opacity-50 cursor-not-allowed"
-                              }`}
-                            >
-                              {loadingPublish === avaliacao.id ? "Publicando..." : "Publicar"}
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleArchive(avaliacao.id)}
-                            className="text-yellow-600 hover:text-yellow-700"
-                          >
-                            Arquivar
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </section>
+          {renderContent()}
         </main>
       </div>
     </div>
