@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { FaUser, FaCalendarAlt, FaClipboardList, FaTag, FaFileInvoice } from "react-icons/fa";
 import HeaderCpanel from "../../components/HeaderCpanel";
