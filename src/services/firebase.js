@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, DocumentData } from "firebase/firestore"; // Certificando-se de que essas funções estão importadas corretamente
-
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: "AIzaSyCaurYJPzoYSKyhGP9ATHRV4eLJBhV821g",
   authDomain: "portifolio-luiz-paulo.firebaseapp.com",
@@ -17,5 +16,4 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Exporte as funções necessárias
-export { auth, db, collection, addDoc, getDocs, query, where, doc, updateDoc, DocumentData };
+export { auth, db, collection, addDoc, getDocs, query, where, doc, updateDoc };
