@@ -25,7 +25,6 @@ const CuponsDesconto = () => {
     const [nomeCampanha, setNomeCampanha] = useState('');
     const [descricaoCampanha, setDescricaoCampanha] = useState('');
     const [valorDesconto, setValorDesconto] = useState(0);
-    const [quantidadeCupons, setQuantidadeCupons] = useState(0);
     const [limiteCupons, setLimiteCupons] = useState(0); // Limite de cupons
     const [dataInicio, setDataInicio] = useState('');
     const [dataFim, setDataFim] = useState('');
@@ -67,7 +66,7 @@ const CuponsDesconto = () => {
         };
 
         try {
-            const docRef = await addDoc(collection(db, 'campanhas'), novaCampanha);
+            await addDoc(collection(db, 'campanhas'), novaCampanha);
             alert('Campanha criada com sucesso!');
             fetchCampanhas();  // Recarregar campanhas
         } catch (e) {
@@ -209,27 +208,23 @@ const CuponsDesconto = () => {
                         Criar Campanha
                     </button>
                 </div>
-            </div>
 
-            {/* Listagem de campanhas */}
-            <div className="bg-white p-6 rounded-lg shadow-xl mt-6">
-                <h3 className="text-2xl font-semibold mb-4">Campanhas Ativas</h3>
-                <div className="space-y-6">
-                    {campanhas.map((campanha) => (
-                        <div key={campanha.id} className="p-6 shadow-xl bg-gray-50 rounded-md">
-                            <h4 className="text-xl font-semibold">{campanha.nome}</h4>
-                            <p>{campanha.descricao}</p>
-                            <p><strong>Desconto:</strong> {campanha.valor_desconto}%</p>
-                            <p><strong>Status:</strong> {campanha.status}</p>
-                            <button
-                                onClick={() => handleGerarCupons(campanha.id)}
-                                className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition-all mt-3"
-                            >
-                                Gerar Cupons
-                            </button>
-                        </div>
-                    ))}
-                </div>
+                {/* Exibição das campanhas existentes */}
+                <h3 className="text-2xl font-semibold mb-4">Campanhas Criadas</h3>
+                {campanhas.map(campanha => (
+                    <div key={campanha.id} className="mb-4 p-4 shadow-lg rounded-lg">
+                        <h4 className="text-xl font-semibold">{campanha.nome}</h4>
+                        <p>{campanha.descricao}</p>
+                        <p>Valor de Desconto: {campanha.valor_desconto}%</p>
+                        <p>Status: {campanha.status}</p>
+                        <button
+                            onClick={() => handleGerarCupons(campanha.id)}
+                            className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
+                        >
+                            Gerar Cupons
+                        </button>
+                    </div>
+                ))}
             </div>
         </div>
     );

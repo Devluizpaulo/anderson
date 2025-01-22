@@ -1,4 +1,4 @@
-import { db, collection, getDocs, DocumentData } from './firebase';
+import { db, collection, getDocs } from './firebase';
 
 // Defina a interface para os dados de um cliente
 interface Cliente {

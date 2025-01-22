@@ -4,8 +4,6 @@ import ClienteForm from './ClienteForm';
 import ClienteList from './ClienteList';
 import ClienteSearch from './ClienteSearch';
 import { getClientes } from '../../services/clienteService'; // Importe o serviço de clientes
-import { format } from 'date-fns'; // Importação necessária para formatar datas
-
 
 // Definindo uma interface para os dados de cliente
 interface Cliente {
@@ -17,32 +15,33 @@ interface Cliente {
 }
 
 const Clientes: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedClient, setSelectedClient] = useState<Cliente | null>(null); // Tipo de selectedClient
-    const [clients, setClients] = useState<Cliente[]>([]); // Lista de clientes com o tipo correto
-    const [showForm, setShowForm] = useState(false); // Estado para mostrar/ocultar o formulário
-    
-    const formattedDate = format(new Date(), 'dd/MM/yyyy'); // Usando a função 'format'
-    console.log(formattedDate); // Exibe a data formatada
-    
+    const [searchQuery, setSearchQuery] = useState(''); // Filtro de busca
+    const [selectedClient, setSelectedClient] = useState<Cliente | null>(null); // Cliente selecionado
+    const [clients, setClients] = useState<Cliente[]>([]); // Lista de clientes
+    const [showForm, setShowForm] = useState(false); // Estado para exibir/ocultar o formulário
+
+    // Carregar os clientes quando o componente for montado
     useEffect(() => {
         const fetchClients = async () => {
             const fetchedClients = await getClientes();
-            setClients(fetchedClients);
+            setClients(fetchedClients); // Armazenar clientes no estado
         };
         fetchClients();
-    }, []); // Carregar clientes apenas uma vez ao montar o componente
+    }, []); // Carregar clientes apenas uma vez
 
+    // Função de busca
     const handleSearch = (query: string) => {
-        setSearchQuery(query);
+        setSearchQuery(query); // Atualiza o filtro de busca
     };
 
+    // Função para selecionar um cliente
     const handleSelectClient = (client: Cliente) => {
-        setSelectedClient(client);
+        setSelectedClient(client); // Atualiza o cliente selecionado
     };
 
+    // Função para alternar a visibilidade do formulário
     const toggleForm = () => {
-        setShowForm(prev => !prev); // Alterna o estado de visibilidade do formulário
+        setShowForm(prev => !prev); // Alterna entre mostrar e esconder o formulário
     };
 
     return (
@@ -60,7 +59,10 @@ const Clientes: React.FC = () => {
             {/* Exibe o formulário apenas se showForm for verdadeiro */}
             {showForm && <ClienteForm selectedClient={selectedClient} />}
 
+            {/* Componente de busca */}
             <ClienteSearch clients={clients} onSearch={handleSearch} />
+
+            {/* Componente que lista os clientes */}
             <ClienteList searchQuery={searchQuery} onSelectClient={handleSelectClient} />
         </div>
     );
