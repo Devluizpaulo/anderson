@@ -11,16 +11,30 @@ interface Cliente {
 
 // Função para buscar clientes no Firestore
 const getClientes = async (): Promise<Cliente[]> => {
-  const clientesCollection = collection(db, 'clientes');
-  const snapshot = await getDocs(clientesCollection);
-  const clientesList: Cliente[] = snapshot.docs.map((doc) => {
-    const data = doc.data() as Omit<Cliente, 'id'>; // exclui o campo 'id' da tipagem de 'Cliente'
-    return {
-      id: doc.id,
-      ...data,
-    };
-  });
-  return clientesList;
+  try {
+    const clientesCollection = collection(db, 'clientes');
+    const snapshot = await getDocs(clientesCollection);
+
+    // Verifica se o snapshot contém documentos
+    if (snapshot.empty) {
+      console.warn('Nenhum cliente encontrado.');
+      return []; // Retorna um array vazio se não houver clientes
+    }
+
+    const clientesList: Cliente[] = snapshot.docs.map((doc) => {
+      const data = doc.data() as Omit<Cliente, 'id'>; // Exclui o campo 'id' da tipagem
+      return {
+        id: doc.id,  // Adiciona o 'id' do documento
+        ...data,      // Combina com os outros dados do cliente
+      };
+    });
+
+    return clientesList;
+
+  } catch (error) {
+    console.error("Erro ao buscar clientes:", error);
+    throw new Error("Não foi possível carregar os clientes."); // Lança um erro específico
+  }
 };
 
 export { getClientes };

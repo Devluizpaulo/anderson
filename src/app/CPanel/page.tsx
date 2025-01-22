@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaUser, FaCalendarAlt, FaClipboardList, FaTag, FaFileInvoice } from "react-icons/fa";
 import HeaderCpanel from "../../components/HeaderCpanel";
 import { fetchAvaliacoes, publishAvaliacao, archiveAvaliacao, Avaliacao } from "../../services/avaliacoes";
@@ -61,7 +61,8 @@ const CPanel: React.FC = () => {
   const [showArchived, setShowArchived] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>(TABS.AVALIACOES);
 
-  const loadAvaliacoes = async () => {
+  // Memorizar a função loadAvaliacoes para garantir que ela seja estável entre renderizações
+  const loadAvaliacoes = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchAvaliacoes(showArchived);
@@ -71,7 +72,7 @@ const CPanel: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showArchived]); // 'showArchived' é a dependência relevante aqui
 
   const handlePublish = async (id: string) => {
     setLoadingPublish(id);
@@ -89,8 +90,8 @@ const CPanel: React.FC = () => {
   };
 
   useEffect(() => {
-    loadAvaliacoes();
-  }, [activeTab, showArchived]); // Recarregar avaliações quando o tab ativo ou a visualização de arquivadas mudar
+    loadAvaliacoes(); // Agora loadAvaliacoes já está memorizada e pode ser chamada sem problemas
+  }, [activeTab, showArchived, loadAvaliacoes]); // Incluindo loadAvaliacoes nas dependências
 
   const renderContent = () => {
     switch (activeTab) {

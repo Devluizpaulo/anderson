@@ -21,14 +21,14 @@ interface Campanha {
 }
 
 const CuponsDesconto = () => {
-    const [campanhas, setCampanhas] = useState<Campanha[]>([]);  // Corrigido o tipo de campanhas
+    const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [nomeCampanha, setNomeCampanha] = useState('');
     const [descricaoCampanha, setDescricaoCampanha] = useState('');
     const [valorDesconto, setValorDesconto] = useState(0);
     const [limiteCupons, setLimiteCupons] = useState(0); // Limite de cupons
     const [dataInicio, setDataInicio] = useState('');
     const [dataFim, setDataFim] = useState('');
-    const [statusCampanha, setStatusCampanha] = useState('ativo');
+    const [statusCampanha, setStatusCampanha] = useState('ativo'); // Inicializando o status
     const [customValorDesconto, setCustomValorDesconto] = useState(''); // Valor personalizado
 
     // Buscar campanhas do Firebase
@@ -62,7 +62,7 @@ const CuponsDesconto = () => {
             quantidade_cupons: 0, // Inicialmente, 0 cupons gerados
             inicio: Timestamp.fromDate(new Date(dataInicio)),
             fim: Timestamp.fromDate(new Date(dataFim)),
-            status: statusCampanha,
+            status: statusCampanha, // Passando o valor do status
         };
 
         try {
@@ -161,7 +161,29 @@ const CuponsDesconto = () => {
                                     <option key={valor} value={valor}>{valor}%</option>
                                 ))}
                             </select>
+                            <input
+                                id="customValorDesconto"
+                                type="number"
+                                value={customValorDesconto}
+                                onChange={(e) => setCustomValorDesconto(e.target.value)}
+                                placeholder="Digite um valor personalizado"
+                                className="w-1/2 p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
                         </div>
+                    </div>
+
+                    {/* Status da Campanha */}
+                    <div>
+                        <label className="block text-lg font-medium mb-2" htmlFor="statusCampanha">Status da Campanha</label>
+                        <select
+                            id="statusCampanha"
+                            value={statusCampanha}
+                            onChange={(e) => setStatusCampanha(e.target.value)}
+                            className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
                     </div>
 
                     {/* Limite de Cupons */}
@@ -172,7 +194,7 @@ const CuponsDesconto = () => {
                             type="number"
                             value={limiteCupons}
                             onChange={(e) => setLimiteCupons(Number(e.target.value))}
-                            placeholder="Informe o limite de cupons"
+                            placeholder="Número máximo de cupons"
                             className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -201,15 +223,19 @@ const CuponsDesconto = () => {
                         />
                     </div>
 
-                    <button
-                        onClick={handleCriarCampanha}
-                        className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-all"
-                    >
-                        Criar Campanha
-                    </button>
+                    <div className="col-span-2">
+                        <button
+                            onClick={handleCriarCampanha}
+                            className="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 w-full"
+                        >
+                            Criar Campanha
+                        </button>
+                    </div>
                 </div>
+            </div>
 
-                {/* Exibição das campanhas existentes */}
+            {/* Listagem de Campanhas Criadas */}
+            <div className="mt-8">
                 <h3 className="text-2xl font-semibold mb-4">Campanhas Criadas</h3>
                 {campanhas.map(campanha => (
                     <div key={campanha.id} className="mb-4 p-4 shadow-lg rounded-lg">
