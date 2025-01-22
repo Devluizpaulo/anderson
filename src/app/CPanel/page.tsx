@@ -8,7 +8,7 @@ import AvaliacaoCard from "../../components/AvaliacaoCard";
 import Recibo from "../../components/Recibo"; // Caminho correto para o componente
 import Cupons from "../../components/CuponsDesconto";
 import Agenda from "../../components/Agenda";
-import Clientes from "../../components/Clientes";
+import Clientes from "../../components/ClienteComponent/Clientes";
 
 // Definir as opções do menu como constantes
 const TABS = {
