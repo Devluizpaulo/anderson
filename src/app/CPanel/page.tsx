@@ -1,16 +1,13 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { FaUser, FaCalendarAlt, FaClipboardList, FaTag, FaFileInvoice } from "react-icons/fa";
 import HeaderCpanel from "../../components/HeaderCpanel";
 import { fetchAvaliacoes, publishAvaliacao, archiveAvaliacao, Avaliacao } from "../../services/avaliacoes";
 import AvaliacaoCard from "../../components/AvaliacaoCard";
-import Recibo from "../../components/Recibo"; // Caminho correto para o componente
+import Recibo from "../../components/Recibo";
 import Cupons from "../../components/CuponsDesconto";
 import Agenda from "../../components/Agenda";
 import Clientes from "../../components/Clientes";
 
-// Definir as opções do menu como constantes
 const TABS = {
   AVALIACOES: "avaliacoes",
   AGENDA: "agenda",
@@ -19,7 +16,6 @@ const TABS = {
   RECIBOS: "recibos",
 };
 
-// Sidebar component
 const Sidebar: React.FC<{ setActiveTab: (tab: string) => void }> = ({ setActiveTab }) => (
   <div className="w-64 bg-gray-800 text-white flex flex-col p-4">
     <h2 className="text-2xl font-semibold mb-4">Dashboard</h2>
@@ -89,10 +85,6 @@ const CPanel: React.FC = () => {
     await archiveAvaliacao(id);
     await loadAvaliacoes();
   };
-
-  useEffect(() => {
-    loadAvaliacoes();
-  }, [showArchived]);
 
   useEffect(() => {
     loadAvaliacoes();
