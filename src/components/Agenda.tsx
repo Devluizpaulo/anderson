@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { db } from '../services/firebase';
 import { collection, getDocs } from 'firebase/firestore';
-import { format, isBefore, isToday, isSameDay, differenceInDays, startOfDay } from 'date-fns';
+import { format, isBefore, isSameDay, differenceInDays, startOfDay } from 'date-fns';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; // Estilo do calendário
 
@@ -9,10 +9,11 @@ interface Evento {
     id: string;
     titulo: string;
     descricao: string;
-    data: any; // Timestamp do Firebase
+    data: Date; // Alterar para Date em vez de any
     tipo: 'passado' | 'presente' | 'futuro';
     local: string;
 }
+
 
 const Agenda = () => {
     const [eventos, setEventos] = useState<Evento[]>([]);

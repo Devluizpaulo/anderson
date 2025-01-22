@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../services/firebase';  // Assumindo que você já configurou o Firebase
 import { collection, addDoc, updateDoc, doc, getDocs, query, where, getDoc, Timestamp } from 'firebase/firestore';
 
@@ -7,8 +7,21 @@ const generateCouponCode = () => {
     return 'CUP-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 };
 
+// Definir o tipo da campanha
+interface Campanha {
+    id: string;
+    nome: string;
+    descricao: string;
+    valor_desconto: number | string;
+    limite_cupons: number;
+    quantidade_cupons: number;
+    inicio: Timestamp;
+    fim: Timestamp;
+    status: string;
+}
+
 const CuponsDesconto = () => {
-    const [campanhas, setCampanhas] = useState([]);
+    const [campanhas, setCampanhas] = useState<Campanha[]>([]);  // Corrigido o tipo de campanhas
     const [nomeCampanha, setNomeCampanha] = useState('');
     const [descricaoCampanha, setDescricaoCampanha] = useState('');
     const [valorDesconto, setValorDesconto] = useState(0);
@@ -23,7 +36,7 @@ const CuponsDesconto = () => {
     const fetchCampanhas = async () => {
         const campanhasRef = collection(db, 'campanhas');
         const campanhasSnap = await getDocs(campanhasRef);
-        const campanhasList = campanhasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const campanhasList = campanhasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Campanha[];
         setCampanhas(campanhasList);
     };
 
@@ -32,7 +45,7 @@ const CuponsDesconto = () => {
     }, []);
 
     // Função para verificar a quantidade de cupons restantes
-    const checkCuponsRestantes = async (campanhaId) => {
+    const checkCuponsRestantes = async (campanhaId: string) => {
         const cuponsRef = collection(db, 'cupons');
         const q = query(cuponsRef, where("campanha_id", "==", campanhaId));
         const cuponsSnap = await getDocs(q);
@@ -63,7 +76,7 @@ const CuponsDesconto = () => {
     };
 
     // Gerar cupons para a campanha
-    const handleGerarCupons = async (campanhaId) => {
+    const handleGerarCupons = async (campanhaId: string) => {
         const campanhaRef = doc(db, 'campanhas', campanhaId);
         const campanhaSnap = await getDoc(campanhaRef);
         const campanhaData = campanhaSnap.data();
@@ -191,37 +204,32 @@ const CuponsDesconto = () => {
 
                     <button
                         onClick={handleCriarCampanha}
-                        className="bg-blue-500 text-white p-3 rounded-md w-full hover:bg-blue-600 transition-colors shadow-lg"
+                        className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-all"
                     >
                         Criar Campanha
                     </button>
                 </div>
             </div>
-            {/* Exibição de Campanhas */}
-            <div>
-                <h3 className="text-2xl font-semibold mb-4">Campanhas Criadas</h3>
-                {campanhas.map((campanha) => (
-                    <div key={campanha.id} className="bg-white p-6 rounded-lg shadow-lg mb-6">
-                        <h4 className="text-xl font-semibold">{campanha.nome}</h4>
-                        <p>{campanha.descricao}</p>
-                        <p>Valor de Desconto: {campanha.valor_desconto}%</p>
-                        <p>Status: {campanha.status}</p>
-                        <p>Data de Início: {campanha.inicio.toDate().toLocaleDateString()}</p>
-                        <p>Data de Fim: {campanha.fim.toDate().toLocaleDateString()}</p>
 
-                        {/* Verifica e avisa quando restar apenas 1 cupom */}
-                        <p className="text-red-500">
-                            {campanha.limite_cupons - campanha.quantidade_cupons === 1 && "Atenção: Restando apenas 1 cupom!"}
-                        </p>
-
-                        <button
-                            onClick={() => handleGerarCupons(campanha.id)}
-                            className="bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition-colors shadow-lg"
-                        >
-                            Gerar Cupons
-                        </button>
-                    </div>
-                ))}
+            {/* Listagem de campanhas */}
+            <div className="bg-white p-6 rounded-lg shadow-xl mt-6">
+                <h3 className="text-2xl font-semibold mb-4">Campanhas Ativas</h3>
+                <div className="space-y-6">
+                    {campanhas.map((campanha) => (
+                        <div key={campanha.id} className="p-6 shadow-xl bg-gray-50 rounded-md">
+                            <h4 className="text-xl font-semibold">{campanha.nome}</h4>
+                            <p>{campanha.descricao}</p>
+                            <p><strong>Desconto:</strong> {campanha.valor_desconto}%</p>
+                            <p><strong>Status:</strong> {campanha.status}</p>
+                            <button
+                                onClick={() => handleGerarCupons(campanha.id)}
+                                className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition-all mt-3"
+                            >
+                                Gerar Cupons
+                            </button>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

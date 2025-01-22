@@ -4,6 +4,8 @@ import ClienteForm from './ClienteForm';
 import ClienteList from './ClienteList';
 import ClienteSearch from './ClienteSearch';
 import { getClientes } from '../../services/clienteService'; // Importe o serviço de clientes
+import { format } from 'date-fns'; // Importação necessária para formatar datas
+
 
 // Definindo uma interface para os dados de cliente
 interface Cliente {
@@ -19,7 +21,10 @@ const Clientes: React.FC = () => {
     const [selectedClient, setSelectedClient] = useState<Cliente | null>(null); // Tipo de selectedClient
     const [clients, setClients] = useState<Cliente[]>([]); // Lista de clientes com o tipo correto
     const [showForm, setShowForm] = useState(false); // Estado para mostrar/ocultar o formulário
-
+    
+    const formattedDate = format(new Date(), 'dd/MM/yyyy'); // Usando a função 'format'
+    console.log(formattedDate); // Exibe a data formatada
+    
     useEffect(() => {
         const fetchClients = async () => {
             const fetchedClients = await getClientes();
@@ -43,7 +48,7 @@ const Clientes: React.FC = () => {
     return (
         <div className="p-4">
             <h1 className="text-2xl font-bold mb-4">Gerenciamento de Clientes</h1>
-            
+
             {/* Botão para alternar a exibição do formulário */}
             <button
                 onClick={toggleForm}
@@ -54,7 +59,7 @@ const Clientes: React.FC = () => {
 
             {/* Exibe o formulário apenas se showForm for verdadeiro */}
             {showForm && <ClienteForm selectedClient={selectedClient} />}
-            
+
             <ClienteSearch clients={clients} onSearch={handleSearch} />
             <ClienteList searchQuery={searchQuery} onSelectClient={handleSelectClient} />
         </div>

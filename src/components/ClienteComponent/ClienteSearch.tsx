@@ -1,15 +1,23 @@
-// src/components/ClienteComponent/ClienteSearch.tsx
 import React, { useState, useEffect } from 'react';
 import { getClientes } from '../../services/clienteService';
 
 interface ClienteSearchProps {
-  clients: { id: string; name: string }[];  // Tipo de clientes
   onSearch: (query: string) => void;
 }
 
-const ClienteSearch: React.FC<ClienteSearchProps> = ({ clients, onSearch }) => {
+const ClienteSearch: React.FC<ClienteSearchProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
   const [filteredClients, setFilteredClients] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      const clientsList = await getClientes();
+      setClients(clientsList);
+    };
+
+    fetchClients();
+  }, []);
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -18,14 +26,14 @@ const ClienteSearch: React.FC<ClienteSearchProps> = ({ clients, onSearch }) => {
       );
       setFilteredClients(filtered);
     } else {
-      setFilteredClients([]);
+      setFilteredClients(clients);  // Exibir todos os clientes se a pesquisa estiver vazia
     }
   }, [searchQuery, clients]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    onSearch(query);
+    onSearch(query);  // Passa a pesquisa para o componente pai
   };
 
   return (
@@ -35,6 +43,7 @@ const ClienteSearch: React.FC<ClienteSearchProps> = ({ clients, onSearch }) => {
         value={searchQuery}
         onChange={handleInputChange}
         placeholder="Buscar cliente"
+        aria-label="Buscar cliente"  // Melhora a acessibilidade
         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
       />
       {filteredClients.length > 0 && (
