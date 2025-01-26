@@ -29,10 +29,17 @@ const Agenda = () => {
     try {
       const clientesRef = collection(db, "clientes");
       const clientesSnap = await getDocs(clientesRef);
-      const clientesList: Cliente[] = clientesSnap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const clientesList: Cliente[] = clientesSnap.docs.map((doc) => {
+        const clienteData = doc.data();
+        return {
+          id: doc.id,
+          nome: clienteData.nome,  // Assumindo que os documentos têm esses campos
+          sobrenome: clienteData.sobrenome,
+          email: clienteData.email,
+          endereco: clienteData.endereco,
+          observacoes: clienteData.observacoes,  // Se houver este campo, por exemplo
+        };
+      });
       setClientes(clientesList);
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
@@ -40,6 +47,7 @@ const Agenda = () => {
       setCarregando(false);
     }
   }, []);
+
 
   useEffect(() => {
     fetchClientes();

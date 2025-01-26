@@ -11,6 +11,7 @@ interface ClienteListProps {
 const ClienteList: React.FC<ClienteListProps> = ({ clients, onSelectClient }) => {
   const handleDelete = async (id: string) => {
     try {
+      // Excluindo o cliente do Firestore
       const clientRef = doc(db, 'clientes', id);
       await deleteDoc(clientRef);
       alert('Cliente excluído com sucesso');
@@ -26,7 +27,7 @@ const ClienteList: React.FC<ClienteListProps> = ({ clients, onSelectClient }) =>
         <li key={client.id} className="border-b py-2">
           {/* Exibição do nome e sobrenome do cliente */}
           <span className="font-bold">{client.nome} {client.sobrenome}</span>
-          
+
           {/* Exibindo o e-mail */}
           <div>{client.email}</div>
 
@@ -38,7 +39,7 @@ const ClienteList: React.FC<ClienteListProps> = ({ clients, onSelectClient }) =>
           </div>
 
           {/* Exibindo observações */}
-          <div className="text-gray-500">{client.observacoes}</div>
+          <div className="text-gray-500">{client.observacoes || 'Sem observações'}</div>
 
           {/* Botões de editar e excluir */}
           <div className="mt-2">
