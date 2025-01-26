@@ -75,10 +75,15 @@ const Agenda = () => {
 
     // Função para tratar a mudança de data no calendário
     const handleDateChange = (date: Date | Date[] | null) => {
-        if (Array.isArray(date)) {
-            setDataSelecionada(date[0] as Date || new Date()); // A primeira data do intervalo
+        if (date === null) {
+            // Caso a data seja null, define para a data atual
+            setDataSelecionada(new Date());
+        } else if (Array.isArray(date)) {
+            // Caso seja um intervalo de datas, pega a primeira data do intervalo
+            setDataSelecionada(date[0]);
         } else {
-            setDataSelecionada(date || new Date()); // Caso seja null, seleciona a data atual
+            // Caso seja uma data única, simplesmente define
+            setDataSelecionada(date);
         }
     };
 
@@ -123,13 +128,12 @@ const Agenda = () => {
                     eventosDoDia.map((evento) => (
                         <div
                             key={evento.id}
-                            className={`p-6 bg-white rounded-lg shadow-lg hover:scale-105 transform transition-all ${
-                                evento.tipo === 'passado'
+                            className={`p-6 bg-white rounded-lg shadow-lg hover:scale-105 transform transition-all ${evento.tipo === 'passado'
                                     ? 'border-l-4 border-gray-500'
                                     : evento.tipo === 'presente'
-                                    ? 'border-l-4 border-blue-500'
-                                    : 'border-l-4 border-green-500'
-                            }`}
+                                        ? 'border-l-4 border-blue-500'
+                                        : 'border-l-4 border-green-500'
+                                }`}
                         >
                             <h3 className="text-xl font-semibold text-gray-800">{evento.titulo}</h3>
                             <p className="text-gray-600">{evento.descricao}</p>
