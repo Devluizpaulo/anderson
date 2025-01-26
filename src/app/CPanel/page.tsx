@@ -8,7 +8,7 @@ import AvaliacaoCard from "../../components/AvaliacaoCard";
 import Recibo from "../../components/Recibo";
 import Cupons from "../../components/CuponsDesconto";
 import Agenda from "../../components/Agenda";
-import Clientes from "../../components/Clientes";
+import Clientes from "../../components/ClienteComponent/Clientes";
 
 const TABS = {
   AVALIACOES: "avaliacoes",
