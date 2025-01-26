@@ -1,113 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Cliente } from './ClienteSearch';
 import { db } from '../../services/firebase';
-import { collection, getDocs, updateDoc, deleteDoc, doc, setDoc, getDoc } from 'firebase/firestore';
-
-interface Cliente {
-  id: string;
-  name: string;
-  email: string;
-}
+import { doc, deleteDoc } from 'firebase/firestore';
 
 interface ClienteListProps {
-  searchQuery: string;
+  clients: Cliente[];
   onSelectClient: (client: Cliente) => void;
 }
 
-const ClienteList: React.FC<ClienteListProps> = ({ searchQuery, onSelectClient }) => {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'clientes'));
-        const clientsData: Cliente[] = [];
-        querySnapshot.forEach((doc) => {
-          clientsData.push({ id: doc.id, ...doc.data() } as Cliente);
-        });
-        setClientes(clientsData);
-      } catch (error) {
-        console.error('Erro ao buscar clientes:', error);
-      }
-    };
-
-    fetchClients();
-  }, []);
-
+const ClienteList: React.FC<ClienteListProps> = ({ clients, onSelectClient }) => {
   const handleDelete = async (id: string) => {
     try {
       const clientRef = doc(db, 'clientes', id);
-      const clientSnapshot = await getDoc(clientRef);
-
-      if (!clientSnapshot.exists()) {
-        console.error('Cliente não encontrado.');
-        return;
-      }
-
-      const clientData = clientSnapshot.data();
-      if (clientData) {
-        const archivedClientRef = doc(db, 'clientes_arquivados', id);
-        await setDoc(archivedClientRef, { ...clientData, archivedAt: new Date() });
-
-        await deleteDoc(clientRef);
-
-        setClientes((prevClientes) => prevClientes.filter((cliente) => cliente.id !== id));
-        console.log('Cliente arquivado e excluído com sucesso.');
-      }
+      await deleteDoc(clientRef);
+      alert('Cliente excluído com sucesso');
     } catch (error) {
       console.error('Erro ao excluir cliente:', error);
+      alert('Erro ao excluir cliente');
     }
   };
-
-  const handleUpdate = async (id: string, updatedData: Partial<Cliente>) => {
-    try {
-      const clientRef = doc(db, 'clientes', id);
-      await updateDoc(clientRef, updatedData);
-
-      setClientes((prevClientes) =>
-        prevClientes.map((cliente) =>
-          cliente.id === id ? { ...cliente, ...updatedData } : cliente
-        )
-      );
-      console.log('Cliente atualizado com sucesso.');
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
-    }
-  };
-
-  const filteredClients = clientes.filter((cliente) =>
-    cliente.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
-    <ul className="bg-white shadow-md rounded p-4">
-      {filteredClients.map((cliente) => (
-        <li
-          key={cliente.id}
-          className="flex justify-between items-center border-b py-2 cursor-pointer hover:bg-gray-100"
-          onClick={() => onSelectClient(cliente)}
-        >
-          <span>{cliente.name}</span>
-          <span className="text-gray-500 text-sm">{cliente.email}</span>
-          <div className="ml-2 flex space-x-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // Evitar que o onClick do item da lista seja disparado
-                handleUpdate(cliente.id, { name: 'Novo Nome' });
-              }}
-              className="text-blue-500 hover:text-blue-700"
-            >
-              Editar
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // Evitar que o onClick do item da lista seja disparado
-                handleDelete(cliente.id);
-              }}
-              className="text-red-500 hover:text-red-700"
-            >
-              Excluir
-            </button>
-          </div>
+    <ul>
+      {clients.map((client) => (
+        <li key={client.id}>
+          <span>{client.name}</span>
+          <span>{client.email}</span>
+          <button onClick={() => onSelectClient(client)}>Editar</button>
+          <button onClick={() => handleDelete(client.id)}>Excluir</button>
         </li>
       ))}
     </ul>
