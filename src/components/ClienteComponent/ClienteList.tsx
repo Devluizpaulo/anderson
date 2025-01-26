@@ -4,7 +4,7 @@ import { collection, getDocs, updateDoc, deleteDoc, doc, setDoc, getDoc } from '
 
 interface Cliente {
   id: string;
-  nome: string;
+  name: string;
   email: string;
 }
 
@@ -73,7 +73,7 @@ const ClienteList: React.FC<ClienteListProps> = ({ searchQuery, onSelectClient }
   };
 
   const filteredClients = clientes.filter((cliente) =>
-    cliente.nome && typeof cliente.nome === 'string' && cliente.nome.toLowerCase().includes(searchQuery?.toLowerCase() || '')
+    cliente.name && typeof cliente.name === 'string' && cliente.name.toLowerCase().includes(searchQuery?.toLowerCase() || '')
   );
 
   // Garantindo que o retorno seja JSX válido
@@ -85,11 +85,11 @@ const ClienteList: React.FC<ClienteListProps> = ({ searchQuery, onSelectClient }
           className="flex justify-between items-center border-b py-2 cursor-pointer hover:bg-gray-100"
           onClick={() => onSelectClient(cliente)}
         >
-          <span>{cliente.nome}</span>
+          <span>{cliente.name}</span>
           <span className="text-gray-500 text-sm">{cliente.email}</span>
           <div className="ml-2 flex space-x-2">
             <button
-              onClick={() => handleUpdate(cliente.id, { nome: 'Novo Nome' })}
+              onClick={() => handleUpdate(cliente.id, { name: 'Novo Nome' })}
               className="text-blue-500 hover:text-blue-700"
             >
               Editar
