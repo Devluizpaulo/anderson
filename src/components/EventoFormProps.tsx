@@ -7,7 +7,6 @@ interface Cliente {
   nome: string;
   cpf: string;
   telefone: string;
-  // Adicione outros campos se necessário
 }
 
 interface EventoFormProps {
@@ -17,16 +16,16 @@ interface EventoFormProps {
 const EventoForm = ({ onEventoCadastrado }: EventoFormProps) => {
   const [nomeCliente, setNomeCliente] = useState<string>('');
   const [clientesEncontrados, setClientesEncontrados] = useState<Cliente[]>([]);
-  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null); // Estado para armazenar o cliente selecionado
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
   const [titulo, setTitulo] = useState<string>('');
   const [descricao, setDescricao] = useState<string>('');
   const [data, setData] = useState<Date>(new Date());
   const [local, setLocal] = useState<string>('');
-  const [mostrarCadastroCliente, setMostrarCadastroCliente] = useState<boolean>(false); // Exibir formulário de cadastro de cliente
+  const [mostrarCadastroCliente, setMostrarCadastroCliente] = useState<boolean>(false);
 
   // Função para pesquisar clientes
   const pesquisarCliente = async (nome: string) => {
-    if (nome.length > 2) {  // A pesquisa começa após 3 caracteres
+    if (nome.length > 2) {
       const clientesRef = collection(db, 'clientes');
       const q = query(clientesRef, where('nome', '>=', nome), where('nome', '<=', nome + '\uf8ff'));
       try {
@@ -34,37 +33,40 @@ const EventoForm = ({ onEventoCadastrado }: EventoFormProps) => {
         const clientes: Cliente[] = querySnapshot.docs.map(doc => ({
           ...doc.data(),
           id: doc.id
-        }));
+        })) as Cliente[];
 
         setClientesEncontrados(clientes);
       } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
+        console.error('Erro ao buscar clientes:', error);
       }
     } else {
-      setClientesEncontrados([]);  // Limpa a pesquisa se o nome for muito curto
+      setClientesEncontrados([]);
     }
   };
 
-  // Função para salvar um novo cliente
+  // Função para cadastrar novo cliente
   const cadastrarCliente = async () => {
     try {
       const clienteRef = collection(db, 'clientes');
       const docRef = await addDoc(clienteRef, {
         nome: nomeCliente,
-        cpf: '000.000.000-00', // Simplesmente como exemplo, adicione outros campos necessários
+        cpf: '000.000.000-00',
         telefone: '0000000000',
-        // Adicione mais campos conforme necessário
       });
-      setClienteSelecionado({
+
+      const novoCliente = {
         id: docRef.id,
         nome: nomeCliente,
         cpf: '000.000.000-00',
         telefone: '0000000000',
-      });
-      setMostrarCadastroCliente(false);  // Fecha o formulário de cadastro de cliente
+      };
+
+      setClienteSelecionado(novoCliente);
+      setMostrarCadastroCliente(false);
+      setNomeCliente('');  // Limpa o campo de nome após cadastrar
       alert('Cliente cadastrado com sucesso!');
     } catch (error) {
-      console.error("Erro ao cadastrar cliente:", error);
+      console.error('Erro ao cadastrar cliente:', error);
     }
   };
 
@@ -73,17 +75,37 @@ const EventoForm = ({ onEventoCadastrado }: EventoFormProps) => {
     pesquisarCliente(nomeCliente);
   }, [nomeCliente]);
 
-  // Função para salvar evento
-  const salvarEvento = () => {
-    // Lógica para salvar o evento, considerando dados como nome do cliente, etc.
-    onEventoCadastrado();
+  // Função para salvar o evento no Firebase
+  const salvarEvento = async () => {
+    if (clienteSelecionado && titulo && descricao && local) {
+      try {
+        // Salva o evento no Firestore
+        const eventoRef = collection(db, 'eventos');
+        await addDoc(eventoRef, {
+          clienteId: clienteSelecionado.id,
+          clienteNome: clienteSelecionado.nome,
+          titulo,
+          descricao,
+          data,
+          local,
+        });
+
+        onEventoCadastrado(); // Chama a função do componente pai para indicar que o evento foi cadastrado
+        alert('Evento cadastrado com sucesso!');
+      } catch (error) {
+        console.error('Erro ao salvar evento:', error);
+        alert('Erro ao salvar evento');
+      }
+    } else {
+      alert('Por favor, preencha todos os campos.');
+    }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-3xl font-semibold mb-4">Cadastro de Evento</h2>
 
-      {/* Campo de busca do cliente */}
+      {/* Campo de busca de cliente */}
       <div className="mb-4">
         <input
           type="text"
@@ -95,7 +117,7 @@ const EventoForm = ({ onEventoCadastrado }: EventoFormProps) => {
         {clientesEncontrados.length > 0 && (
           <div className="mt-2">
             <ul>
-              {clientesEncontrados.map(cliente => (
+              {clientesEncontrados.map((cliente) => (
                 <li
                   key={cliente.id}
                   className="py-1 cursor-pointer"
@@ -109,7 +131,7 @@ const EventoForm = ({ onEventoCadastrado }: EventoFormProps) => {
         )}
       </div>
 
-      {/* Se nenhum cliente for selecionado e o nome for suficiente para cadastro */}
+      {/* Exibe o botão para cadastrar um novo cliente */}
       {!clienteSelecionado && nomeCliente.length > 2 && !mostrarCadastroCliente && (
         <div className="text-center mb-4">
           <button
@@ -187,7 +209,7 @@ const EventoForm = ({ onEventoCadastrado }: EventoFormProps) => {
         />
       </div>
 
-      {/* Botão de Salvar */}
+      {/* Botão de Salvar Evento */}
       <div className="text-center">
         <button
           onClick={salvarEvento}
