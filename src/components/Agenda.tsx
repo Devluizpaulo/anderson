@@ -5,6 +5,7 @@ import { format, isBefore, isSameDay, differenceInDays, startOfDay } from 'date-
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; // Estilo do calendário
 
+// Interface do Evento
 interface Evento {
     id: string;
     titulo: string;
@@ -14,42 +15,39 @@ interface Evento {
     local: string;
 }
 
+// Componente da Agenda
 const Agenda = () => {
     const [eventos, setEventos] = useState<Evento[]>([]);
-    const [dataSelecionada, setDataSelecionada] = useState<Date | null>(new Date());
+    const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date());
     const [eventosDoDia, setEventosDoDia] = useState<Evento[]>([]);
 
     // Função para buscar os eventos do Firestore
-    useEffect(() => {
-        const fetchEventos = async () => {
-            try {
-                const eventosRef = collection(db, 'eventos');
-                const eventosSnap = await getDocs(eventosRef);
+    const fetchEventos = async () => {
+        try {
+            const eventosRef = collection(db, 'eventos');
+            const eventosSnap = await getDocs(eventosRef);
 
-                // Mapeando os dados dos eventos
-                const eventosList: Evento[] = eventosSnap.docs.map(doc => {
-                    const dataEvento = doc.data().data ? doc.data().data.toDate() : new Date();
-                    return {
-                        id: doc.id,
-                        titulo: doc.data().titulo || 'Título não disponível',
-                        descricao: doc.data().descricao || 'Descrição não disponível',
-                        local: doc.data().local || 'Local não disponível',
-                        data: dataEvento,
-                        tipo: getEventoTipo(dataEvento),
-                    };
-                });
+            // Mapeando os dados dos eventos
+            const eventosList: Evento[] = eventosSnap.docs.map((doc) => {
+                const dataEvento = doc.data().data ? doc.data().data.toDate() : new Date();
+                return {
+                    id: doc.id,
+                    titulo: doc.data().titulo || 'Título não disponível',
+                    descricao: doc.data().descricao || 'Descrição não disponível',
+                    local: doc.data().local || 'Local não disponível',
+                    data: dataEvento,
+                    tipo: getEventoTipo(dataEvento),
+                };
+            });
 
-                setEventos(eventosList);
-            } catch (error) {
-                console.error('Erro ao buscar eventos:', error);
-            }
-        };
-
-        fetchEventos();
-    }, []);
+            setEventos(eventosList);
+        } catch (error) {
+            console.error('Erro ao buscar eventos:', error);
+        }
+    };
 
     // Função para determinar o tipo do evento (passado, presente ou futuro)
-    const getEventoTipo = (data: Date) => {
+    const getEventoTipo = (data: Date): 'passado' | 'presente' | 'futuro' => {
         const dataInicioDia = startOfDay(new Date()); // Zera a hora da data de hoje
         if (isBefore(data, dataInicioDia)) {
             return 'passado';
@@ -61,16 +59,27 @@ const Agenda = () => {
     };
 
     // Filtrar os eventos para o dia selecionado
+    const filtrarEventosDoDia = (data: Date) => {
+        return eventos.filter((evento) => isSameDay(evento.data, data));
+    };
+
+    // Efeito para buscar eventos e filtrar os eventos do dia selecionado
     useEffect(() => {
-        if (dataSelecionada) {
-            const eventosDia = eventos.filter(evento => isSameDay(evento.data, dataSelecionada));
-            setEventosDoDia(eventosDia);
-        }
+        fetchEventos();
+    }, []);
+
+    useEffect(() => {
+        const eventosDia = filtrarEventosDoDia(dataSelecionada);
+        setEventosDoDia(eventosDia);
     }, [dataSelecionada, eventos]);
 
     // Função para tratar a mudança de data no calendário
-    const handleDateChange = (date: Date | null) => {
-        setDataSelecionada(date);
+    const handleDateChange = (date: Date | Date[] | null) => {
+        if (Array.isArray(date)) {
+            setDataSelecionada(date[0] as Date || new Date()); // A primeira data do intervalo
+        } else {
+            setDataSelecionada(date || new Date()); // Caso seja null, seleciona a data atual
+        }
     };
 
     // Função para calcular a diferença de dias entre a data selecionada e a data atual
@@ -89,11 +98,11 @@ const Agenda = () => {
     return (
         <div className="p-6">
             <h1 className="text-4xl font-semibold text-center mb-8">Agenda de Eventos</h1>
-            
+
             {/* Exibição da data selecionada */}
             <div className="mb-6 text-center">
                 <h2 className="text-2xl font-semibold text-blue-600">
-                    {dataSelecionada ? format(dataSelecionada, 'dd/MM/yyyy') : 'Data não selecionada'} - {dataSelecionada ? calcularDias(dataSelecionada) : ''}
+                    {format(dataSelecionada, 'dd/MM/yyyy')} - {calcularDias(dataSelecionada)}
                 </h2>
             </div>
 
@@ -111,7 +120,7 @@ const Agenda = () => {
                 {eventosDoDia.length === 0 ? (
                     <p className="text-gray-500">Sem eventos para este dia.</p>
                 ) : (
-                    eventosDoDia.map(evento => (
+                    eventosDoDia.map((evento) => (
                         <div
                             key={evento.id}
                             className={`p-6 bg-white rounded-lg shadow-lg hover:scale-105 transform transition-all ${
