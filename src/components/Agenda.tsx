@@ -1,225 +1,265 @@
-import { useEffect, useState, useCallback } from 'react';
-import { db } from '../services/firebase';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
-import { format, isBefore, isSameDay, differenceInDays, startOfDay } from 'date-fns';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { PlusCircleIcon, CalendarIcon, MapPinIcon, UserIcon } from '@heroicons/react/24/solid';
+import React, { useState, useEffect, useCallback } from "react";
+import ClienteSearch, { Cliente } from "../components/ClienteComponent/ClienteSearch";
+import { db } from "../services/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/solid";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
-// Interface do Evento
-interface Evento {
-  id: string;
-  titulo: string;
-  descricao: string;
-  data: Date;
-  tipo: 'passado' | 'presente' | 'futuro';
-  local: string;
-}
-
-// Componente para exibição de eventos
-const EventoCard = ({ evento }: { evento: Evento }) => (
-  <div
-    className={`p-6 bg-white rounded-lg shadow-lg flex flex-col gap-4 hover:scale-105 transform transition-all ${
-      evento.tipo === 'passado'
-        ? 'border-l-4 border-gray-500'
-        : evento.tipo === 'presente'
-        ? 'border-l-4 border-blue-500'
-        : 'border-l-4 border-green-500'
-    }`}
-  >
-    <h3 className="text-xl font-semibold text-gray-800">{evento.titulo}</h3>
-    <p className="text-gray-600">{evento.descricao}</p>
-    <div className="flex items-center gap-2 text-gray-500">
-      <MapPinIcon className="h-5 w-5" />
-      {evento.local}
-    </div>
-    <div className="flex items-center gap-2 text-sm text-gray-400">
-      <CalendarIcon className="h-5 w-5" />
-      {format(evento.data, 'dd/MM/yyyy HH:mm')}
-    </div>
-  </div>
-);
-
-// Componente principal da Agenda
 const Agenda = () => {
-  const [eventos, setEventos] = useState<Evento[]>([]);
-  const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date());
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [clientesFiltrados, setClientesFiltrados] = useState<Cliente[]>([]);
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
   const [novoEvento, setNovoEvento] = useState({
-    cliente: '',
-    origem: '',
-    destino: '',
-    data: '',
-    hora: '',
+    cliente: "",
+    origem: "",
+    destino: "",
+    data: "",
+    hora: "",
+    valor: "",
   });
+  const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date());
+  const [eventos, setEventos] = useState<any[]>([]);
+  const [carregando, setCarregando] = useState<boolean>(false);
+  const [mostrarModal, setMostrarModal] = useState(false);
 
-  // Carrega eventos da base de dados
-  const fetchEventos = useCallback(async () => {
+  // Função para buscar os clientes
+  const fetchClientes = useCallback(async () => {
+    setCarregando(true);
     try {
-      const eventosRef = collection(db, 'eventos');
-      const eventosSnap = await getDocs(eventosRef);
-
-      const eventosList: Evento[] = eventosSnap.docs.map((doc) => {
-        const dataEvento = doc.data().data.toDate();
-        return {
-          id: doc.id,
-          titulo: doc.data().titulo || 'Título não disponível',
-          descricao: doc.data().descricao || 'Descrição não disponível',
-          local: doc.data().local || 'Local não disponível',
-          data: dataEvento,
-          tipo: getEventoTipo(dataEvento),
-        };
-      });
-
-      setEventos(eventosList);
+      const clientesRef = collection(db, "clientes");
+      const clientesSnap = await getDocs(clientesRef);
+      const clientesList: Cliente[] = clientesSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setClientes(clientesList);
     } catch (error) {
-      console.error('Erro ao buscar eventos:', error);
+      console.error("Erro ao buscar clientes:", error);
+    } finally {
+      setCarregando(false);
     }
   }, []);
 
-  // Determina o tipo do evento
-  const getEventoTipo = (data: Date): 'passado' | 'presente' | 'futuro' => {
-    const hoje = startOfDay(new Date());
-    if (isBefore(data, hoje)) return 'passado';
-    if (isSameDay(data, hoje)) return 'presente';
-    return 'futuro';
-  };
+  useEffect(() => {
+    fetchClientes();
+  }, [fetchClientes]);
 
-  // Adiciona novo evento
-  const handleAddEvento = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const { cliente, origem, destino, data, hora } = novoEvento;
-    const dataCompleta = new Date(`${data}T${hora}`);
-
-    try {
-      const docRef = await addDoc(collection(db, 'eventos'), {
-        titulo: `Corrida: ${cliente}`,
-        descricao: `De ${origem} para ${destino}`,
-        local: destino,
-        data: dataCompleta,
-      });
-
-      setEventos((prevEventos) => [
-        ...prevEventos,
-        {
-          id: docRef.id,
-          titulo: `Corrida: ${cliente}`,
-          descricao: `De ${origem} para ${destino}`,
-          local: destino,
-          data: dataCompleta,
-          tipo: getEventoTipo(dataCompleta),
-        },
-      ]);
-
-      setNovoEvento({ cliente: '', origem: '', destino: '', data: '', hora: '' });
-    } catch (error) {
-      console.error('Erro ao adicionar evento:', error);
+  // Função chamada quando a pesquisa é feita
+  const handleSearch = (query: string) => {
+    if (query === "") {
+      setClientesFiltrados([]);
+    } else {
+      const filtered = clientes.filter(
+        (cliente) =>
+          cliente.nome.toLowerCase().includes(query.toLowerCase()) ||
+          cliente.email.toLowerCase().includes(query.toLowerCase()) ||
+          cliente.endereco.rua.toLowerCase().includes(query.toLowerCase())
+      );
+      setClientesFiltrados(filtered);
     }
   };
 
-  // Filtra os eventos para a data selecionada
-  const eventosDoDia = eventos.filter((evento) => isSameDay(evento.data, dataSelecionada));
+  // Função para definir o cliente selecionado
+  const handleClienteSelect = (cliente: Cliente) => {
+    setClienteSelecionado(cliente);
+    setNovoEvento({
+      ...novoEvento,
+      cliente: `${cliente.nome} ${cliente.sobrenome}`,
+    });
+  };
 
-  // Efeito para carregar os eventos no início
-  useEffect(() => {
-    fetchEventos();
-  }, [fetchEventos]);
+  // Função para adicionar o evento
+  const handleAddEvento = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clienteSelecionado) {
+      alert("Selecione um cliente antes de adicionar o evento.");
+      return;
+    }
 
-  // Calcula a diferença de dias entre a data selecionada e a data atual
-  const calcularDias = (data: Date) => {
-    const hoje = startOfDay(new Date());
-    const diff = differenceInDays(data, hoje);
-    if (diff > 0) return `em ${diff} dia${diff > 1 ? 's' : ''}`;
-    if (diff < 0) return `${Math.abs(diff)} dia${Math.abs(diff) > 1 ? 's' : ''} atrás`;
-    return 'Hoje';
+    const { cliente, origem, destino, data, hora, valor } = novoEvento;
+    const dataCompleta = new Date(`${data}T${hora}`);
+
+    // Verifica se a data e hora são válidas
+    if (isNaN(dataCompleta.getTime())) {
+      alert("Data ou hora inválidos!");
+      return;
+    }
+
+    const evento = {
+      cliente,
+      origem,
+      destino,
+      data: dataCompleta,
+      valor,
+    };
+    setEventos([...eventos, evento]);
+
+    // Limpeza do formulário após adicionar
+    setNovoEvento({
+      cliente: "",
+      origem: "",
+      destino: "",
+      data: "",
+      hora: "",
+      valor: "",
+    });
+    setClienteSelecionado(null);
+    setMostrarModal(false); // Fecha o modal após adicionar o evento
+  };
+
+  // Função para excluir evento
+  const handleDeleteEvento = (index: number) => {
+    const eventosAtualizados = eventos.filter((_, i) => i !== index);
+    setEventos(eventosAtualizados);
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-4xl font-bold text-center mb-8">Agenda de Eventos</h1>
+    <div className="p-8 max-w-6xl mx-auto space-y-8 bg-white rounded-lg shadow-lg">
+      <h1 className="text-4xl font-bold text-center text-blue-600 mb-6">Agenda de Corridas</h1>
 
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-semibold text-blue-600">
-          {format(dataSelecionada, 'dd/MM/yyyy')} - {calcularDias(dataSelecionada)}
-        </h2>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="w-full md:w-1/2">
-          <Calendar
-            onChange={(date) => setDataSelecionada(date as Date)}
-            value={dataSelecionada}
-            className="rounded-lg shadow-lg border border-gray-200 p-4"
-          />
-        </div>
-
-        <form onSubmit={handleAddEvento} className="w-full md:w-1/2 space-y-4">
-          <div className="flex items-center gap-2">
-            <UserIcon className="h-6 w-6 text-blue-500" />
-            <input
-              type="text"
-              placeholder="Cliente"
-              value={novoEvento.cliente}
-              onChange={(e) => setNovoEvento({ ...novoEvento, cliente: e.target.value })}
-              className="border p-2 rounded w-full"
-              required
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPinIcon className="h-6 w-6 text-blue-500" />
-            <input
-              type="text"
-              placeholder="Origem"
-              value={novoEvento.origem}
-              onChange={(e) => setNovoEvento({ ...novoEvento, origem: e.target.value })}
-              className="border p-2 rounded w-full"
-              required
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPinIcon className="h-6 w-6 text-blue-500" />
-            <input
-              type="text"
-              placeholder="Destino"
-              value={novoEvento.destino}
-              onChange={(e) => setNovoEvento({ ...novoEvento, destino: e.target.value })}
-              className="border p-2 rounded w-full"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="date"
-              value={novoEvento.data}
-              onChange={(e) => setNovoEvento({ ...novoEvento, data: e.target.value })}
-              className="border p-2 rounded w-full"
-              required
-            />
-            <input
-              type="time"
-              value={novoEvento.hora}
-              onChange={(e) => setNovoEvento({ ...novoEvento, hora: e.target.value })}
-              className="border p-2 rounded w-full"
-              required
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Botão para abrir o modal de criação de evento */}
+        <div>
           <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-600 transition"
+            onClick={() => setMostrarModal(true)}
+            className="flex items-center bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
           >
-            <PlusCircleIcon className="h-6 w-6" />
-            Adicionar Evento
+            <PlusCircleIcon className="h-5 w-5 inline-block mr-2" />
+            Adicionar Corrida
           </button>
-        </form>
+        </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {eventosDoDia.length === 0 ? (
-          <p className="text-gray-500 text-center">Sem eventos para este dia.</p>
-        ) : (
-          eventosDoDia.map((evento) => <EventoCard key={evento.id} evento={evento} />)
-        )}
+      {/* Modal de criação de evento */}
+      {mostrarModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <button
+              onClick={() => setMostrarModal(false)}
+              className="absolute top-2 right-2 text-gray-600"
+            >
+              &times;
+            </button>
+
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Detalhes do Evento</h2>
+            <form onSubmit={handleAddEvento} className="space-y-4">
+              <div className="space-y-2">
+                <div>
+                  <h3 className="font-semibold text-gray-700 mb-2">Buscar Cliente</h3>
+                  <ClienteSearch onSearch={handleSearch} />
+                  {carregando ? (
+                    <p className="text-gray-500">Carregando clientes...</p>
+                  ) : (
+                    <div className="mt-4">
+                      {clientesFiltrados.length > 0 ? (
+                        clientesFiltrados.map((cliente) => (
+                          <div
+                            key={cliente.id}
+                            className={`border p-3 rounded-lg cursor-pointer mb-2 ${clienteSelecionado?.id === cliente.id ? "bg-blue-100" : "hover:bg-gray-100"}`}
+                            onClick={() => handleClienteSelect(cliente)}
+                          >
+                            <p className="font-semibold">{cliente.nome} {cliente.sobrenome}</p>
+                            <p className="text-sm text-gray-600">{cliente.email}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">Nenhum cliente encontrado.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Origem"
+                    value={novoEvento.origem}
+                    onChange={(e) => setNovoEvento({ ...novoEvento, origem: e.target.value })}
+                    className="w-full border rounded-lg p-3"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Destino"
+                    value={novoEvento.destino}
+                    onChange={(e) => setNovoEvento({ ...novoEvento, destino: e.target.value })}
+                    className="w-full border rounded-lg p-3"
+                    required
+                  />
+                  <div className="flex gap-4">
+                    <input
+                      type="date"
+                      value={novoEvento.data}
+                      onChange={(e) => setNovoEvento({ ...novoEvento, data: e.target.value })}
+                      className="w-full border rounded-lg p-3"
+                      required
+                    />
+                    <input
+                      type="time"
+                      value={novoEvento.hora}
+                      onChange={(e) => setNovoEvento({ ...novoEvento, hora: e.target.value })}
+                      className="w-full border rounded-lg p-3"
+                      required
+                    />
+                  </div>
+                  <input
+                    type="number"
+                    placeholder="Valor da Corrida (opcional)"
+                    value={novoEvento.valor}
+                    onChange={(e) => setNovoEvento({ ...novoEvento, valor: e.target.value })}
+                    className="w-full border rounded-lg p-3"
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
+              >
+                <PlusCircleIcon className="h-5 w-5 inline-block mr-2" />
+                Adicionar Corrida
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Seção do Calendário */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Selecione a Data do Evento</h2>
+        <Calendar
+          onChange={(date) => setDataSelecionada(date as Date)}
+          value={dataSelecionada}
+          className="rounded-lg shadow-lg border border-gray-200"
+        />
       </div>
+
+      {/* Exibição dos Eventos */}
+      <section className="mt-8">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Eventos Cadastrados</h2>
+        {eventos.length > 0 ? (
+          <div className="space-y-4">
+            {eventos.map((evento, index) => (
+              <div key={index} className="border p-4 rounded-lg shadow-sm flex justify-between">
+                <div>
+                  <h3 className="font-semibold text-gray-800">{evento.cliente}</h3>
+                  <p className="text-sm text-gray-600">Origem: {evento.origem}</p>
+                  <p className="text-sm text-gray-600">Destino: {evento.destino}</p>
+                  <p className="text-sm text-gray-600">Data: {evento.data.toLocaleDateString()} às {evento.data.toLocaleTimeString()}</p>
+                  {evento.valor && <p className="text-sm text-gray-600">Valor: R${evento.valor}</p>}
+                </div>
+                <button
+                  onClick={() => handleDeleteEvento(index)}
+                  className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700"
+                >
+                  <TrashIcon className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">Nenhum evento cadastrado.</p>
+        )}
+      </section>
     </div>
   );
 };
