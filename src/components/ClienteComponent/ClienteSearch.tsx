@@ -1,19 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { getClientes } from '../../services/clienteService';
 
+interface Cliente {
+  id: string;
+  name: string;
+}
+
 interface ClienteSearchProps {
   onSearch: (query: string) => void;
 }
 
 const ClienteSearch: React.FC<ClienteSearchProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
-  const [filteredClients, setFilteredClients] = useState<{ id: string; name: string }[]>([]);
+  const [clients, setClients] = useState<Cliente[]>([]); // Usando o tipo Cliente aqui
+  const [filteredClients, setFilteredClients] = useState<Cliente[]>([]); // Também usando o tipo Cliente
 
   useEffect(() => {
     const fetchClients = async () => {
-      const clientsList = await getClientes();
-      setClients(clientsList);
+      try {
+        const clientsList = await getClientes();
+        // Garantindo que o retorno seja tratado como um array de Cliente
+        setClients(clientsList as unknown as Cliente[]); 
+      } catch (error) {
+        console.error('Erro ao buscar clientes:', error);
+      }
     };
 
     fetchClients();
