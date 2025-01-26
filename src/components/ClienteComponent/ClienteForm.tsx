@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../services/firebase';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
+import { PhoneIcon, MapPinIcon, PencilIcon } from '@heroicons/react/20/solid';
 
 // Interfaces para os dados do cliente
 interface Cliente {
@@ -28,7 +29,6 @@ interface ClienteFormProps {
 }
 
 const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) => {
-  // Estados para armazenar os dados do formulário
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
   const [email, setEmail] = useState('');
@@ -44,7 +44,6 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) =
   });
   const [observacoes, setObservacoes] = useState('');
 
-  // Efeito para preencher os campos quando um cliente for selecionado
   useEffect(() => {
     if (selectedClient) {
       setNome(selectedClient.nome);
@@ -55,7 +54,6 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) =
     }
   }, [selectedClient]);
 
-  // Função para buscar endereço com base no CEP
   const buscarEnderecoPorCep = async (cep: string) => {
     if (cep.length === 8) {
       try {
@@ -69,7 +67,7 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) =
             bairro: data.bairro,
             cidade: data.localidade,
             estado: data.uf,
-            pais: 'Brasil', // Como o Viacep é para o Brasil
+            pais: 'Brasil',
             cep: data.cep
           });
         } else {
@@ -82,7 +80,6 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) =
     }
   };
 
-  // Função para lidar com o envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -95,11 +92,9 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) =
     };
 
     if (selectedClient) {
-      // Atualizar cliente existente
       const clientRef = doc(db, 'clientes', selectedClient.id);
       await updateDoc(clientRef, clienteData);
     } else {
-      // Cadastrar novo cliente
       const newDocRef = doc(db, 'clientes');
       await setDoc(newDocRef, clienteData);
     }
@@ -108,108 +103,129 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) =
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <input
-          type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          placeholder="Nome"
-        />
+    <form onSubmit={handleSubmit} className="space-y-4 p-6 border rounded-lg shadow-lg bg-white max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex items-center space-x-2">
+          <PencilIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="Nome"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <PencilIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={sobrenome}
+            onChange={(e) => setSobrenome(e.target.value)}
+            placeholder="Sobrenome"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
       </div>
 
-      <div>
-        <input
-          type="text"
-          value={sobrenome}
-          onChange={(e) => setSobrenome(e.target.value)}
-          placeholder="Sobrenome"
-        />
-      </div>
-
-      <div>
+      <div className="flex items-center space-x-2">
+        <PhoneIcon className="w-5 h-5 text-gray-500" />
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
+          className="border p-2 rounded-lg w-full"
         />
       </div>
 
-      <div>
-        <input
-          type="text"
-          value={endereco.cep}
-          onChange={(e) => {
-            const newCep = e.target.value;
-            setEndereco((prev) => ({ ...prev, cep: newCep }));
-            buscarEnderecoPorCep(newCep);
-          }}
-          placeholder="CEP"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex items-center space-x-2">
+          <MapPinIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={endereco.cep}
+            onChange={(e) => {
+              const newCep = e.target.value;
+              setEndereco((prev) => ({ ...prev, cep: newCep }));
+              buscarEnderecoPorCep(newCep);
+            }}
+            placeholder="CEP"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <MapPinIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={endereco.rua}
+            onChange={(e) => setEndereco((prev) => ({ ...prev, rua: e.target.value }))}
+            placeholder="Rua/Av"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
       </div>
 
-      <div>
-        <input
-          type="text"
-          value={endereco.rua}
-          onChange={(e) => setEndereco((prev) => ({ ...prev, rua: e.target.value }))}
-          placeholder="Rua/Av"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex items-center space-x-2">
+          <MapPinIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={endereco.numero}
+            onChange={(e) => setEndereco((prev) => ({ ...prev, numero: e.target.value }))}
+            placeholder="Número"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <MapPinIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={endereco.bairro}
+            onChange={(e) => setEndereco((prev) => ({ ...prev, bairro: e.target.value }))}
+            placeholder="Bairro"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
       </div>
 
-      <div>
-        <input
-          type="text"
-          value={endereco.numero}
-          onChange={(e) => setEndereco((prev) => ({ ...prev, numero: e.target.value }))}
-          placeholder="Número"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex items-center space-x-2">
+          <MapPinIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={endereco.cidade}
+            onChange={(e) => setEndereco((prev) => ({ ...prev, cidade: e.target.value }))}
+            placeholder="Cidade"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <MapPinIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={endereco.estado}
+            onChange={(e) => setEndereco((prev) => ({ ...prev, estado: e.target.value }))}
+            placeholder="Estado"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
       </div>
 
-      <div>
-        <input
-          type="text"
-          value={endereco.complemento}
-          onChange={(e) => setEndereco((prev) => ({ ...prev, complemento: e.target.value }))}
-          placeholder="Complemento"
-        />
-      </div>
-
-      <div>
-        <input
-          type="text"
-          value={endereco.bairro}
-          onChange={(e) => setEndereco((prev) => ({ ...prev, bairro: e.target.value }))}
-          placeholder="Bairro"
-        />
-      </div>
-
-      <div>
-        <input
-          type="text"
-          value={endereco.cidade}
-          onChange={(e) => setEndereco((prev) => ({ ...prev, cidade: e.target.value }))}
-          placeholder="Cidade"
-        />
-      </div>
-
-      <div>
-        <input
-          type="text"
-          value={endereco.estado}
-          onChange={(e) => setEndereco((prev) => ({ ...prev, estado: e.target.value }))}
-          placeholder="Estado"
-        />
-      </div>
-
-      <div>
-        <input
-          type="text"
-          value={endereco.pais}
-          onChange={(e) => setEndereco((prev) => ({ ...prev, pais: e.target.value }))}
-          placeholder="País"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex items-center space-x-2">
+          <MapPinIcon className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={endereco.pais}
+            onChange={(e) => setEndereco((prev) => ({ ...prev, pais: e.target.value }))}
+            placeholder="País"
+            className="border p-2 rounded-lg w-full"
+          />
+        </div>
       </div>
 
       <div>
@@ -217,11 +233,24 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ selectedClient, onSubmit }) =
           value={observacoes}
           onChange={(e) => setObservacoes(e.target.value)}
           placeholder="Observações"
+          className="border p-2 rounded-lg w-full"
         />
       </div>
 
-      <div>
-        <button type="submit">{selectedClient ? 'Atualizar Cliente' : 'Cadastrar Cliente'}</button>
+      <div className="flex justify-end space-x-2">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
+        >
+          {selectedClient ? 'Atualizar Cliente' : 'Cadastrar Cliente'}
+        </button>
+        <button
+          type="button"
+          onClick={() => onSubmit()}
+          className="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition duration-200"
+        >
+          Cancelar
+        </button>
       </div>
     </form>
   );
