@@ -5,10 +5,23 @@ import ClienteSearch from './ClienteSearch';
 import { db } from '../../services/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
+// Interface atualizada para refletir a nova estrutura do cliente
 interface Cliente {
   id: string;
-  name: string;
+  nome: string;
+  sobrenome: string;
   email: string;
+  endereco: {
+    rua: string;
+    numero: string;
+    complemento: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    pais: string;
+    cep: string;
+  };
+  observacoes: string;
 }
 
 const Clientes: React.FC = () => {
@@ -41,14 +54,18 @@ const Clientes: React.FC = () => {
     setSelectedClient(client);
   };
 
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filtrando os clientes com base no nome (agora considerando 'nome' e 'sobrenome' na busca)
+  const filteredClients = clients.filter(
+    (client) =>
+      client.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.sobrenome.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div>
       <h1>Clientes</h1>
       <ClienteSearch onSearch={handleSearch} />
+      {/* Passando selectedClient para o ClienteForm */}
       <ClienteForm selectedClient={selectedClient} onSubmit={() => setSelectedClient(null)} />
       <ClienteList clients={filteredClients} onSelectClient={handleSelectClient} />
     </div>

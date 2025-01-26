@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../../services/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import React, { useState } from 'react';
+
+export interface Endereco {
+  rua: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  pais: string;
+  cep: string;
+}
 
 export interface Cliente {
   id: string;
-  name: string;
+  nome: string;
+  sobrenome: string;
   email: string;
+  endereco: Endereco;
+  observacoes: string;
 }
 
 interface ClienteSearchProps {
@@ -22,12 +34,15 @@ const ClienteSearch: React.FC<ClienteSearchProps> = ({ onSearch }) => {
   };
 
   return (
-    <input
-      type="text"
-      value={searchQuery}
-      onChange={handleInputChange}
-      placeholder="Buscar cliente"
-    />
+    <div className="mb-4">
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={handleInputChange}
+        placeholder="Buscar cliente por nome, e-mail ou endereço"
+        className="border p-2 w-full rounded"
+      />
+    </div>
   );
 };
 
