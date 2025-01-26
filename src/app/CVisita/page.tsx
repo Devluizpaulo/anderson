@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaInstagram, FaFacebook, FaTwitter, FaStar } from "react-icons/fa";
-import { db, addDoc, collection } from "../../services/firebase"; // Certifique-se de importar corretamente
+import { db, addDoc, collection } from "../../services/firebase";
 
 const LinkNaBio: React.FC = () => {
   const [avaliacaoStep, setAvaliacaoStep] = useState(1);
@@ -10,10 +10,10 @@ const LinkNaBio: React.FC = () => {
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [feedbackTipo, setFeedbackTipo] = useState(""); // Variável para armazenar o tipo de feedback (Elogio ou Crítica)
+  const [feedbackTipo, setFeedbackTipo] = useState("");
   const [estrelas, setEstrelas] = useState(0);
   const [lgpd, setLgpd] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); // Novo estado para controlar o alerta
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleNextStep = () => {
     setAvaliacaoStep(avaliacaoStep + 1);
@@ -26,7 +26,7 @@ const LinkNaBio: React.FC = () => {
         telefone,
         email,
         feedback,
-        feedbackTipo, // Incluindo o tipo de feedback
+        feedbackTipo,
         estrelas,
         lgpd,
         timestamp: new Date(),
@@ -34,9 +34,9 @@ const LinkNaBio: React.FC = () => {
 
       try {
         await addDoc(collection(db, "avaliacoes"), avaliacao);
-        setShowAlert(true); // Exibe o alerta
+        setShowAlert(true);
         setTimeout(() => {
-          window.location.href = "/"; // Redireciona para a home após 2 segundos
+          window.location.href = "/";
         }, 2000);
       } catch (error) {
         console.error("Erro ao enviar avaliação:", error);
@@ -50,55 +50,39 @@ const LinkNaBio: React.FC = () => {
     <div
       className="flex flex-col items-center justify-center min-h-screen p-8"
       style={{
-        backgroundImage: "url('/image.jpg')", // Coloque o caminho correto para sua imagem
-        backgroundSize: "cover", // Ajusta a imagem para cobrir a tela
+        backgroundImage: "url('/image.jpg')",
+        backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundRepeat: "no-repeat", // Evita repetição da imagem
+        backgroundRepeat: "no-repeat",
       }}
     >
-      <h1 className="text-5xl sm:text-5xl font-semibold text-white mb-4">
+      <h1 className="text-4xl sm:text-5xl font-semibold text-white mb-4 text-center">
         Siga-me nas redes sociais
       </h1>
 
-
       {/* Links de redes sociais */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8 w-full max-w-md">
-        <a
-          href="https://instagram.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-4 bg-white text-black py-2 px-4 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
-        >
-          <FaInstagram size={24} />
-          <span className="font-semibold text-sm">Instagram</span>
-        </a>
-        <a
-          href="https://facebook.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-4 bg-white text-black py-2 px-4 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
-        >
-          <FaFacebook size={24} />
-          <span className="font-semibold text-sm">Facebook</span>
-        </a>
-        <a
-          href="https://twitter.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-4 bg-white text-black py-2 px-4 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
-        >
-          <FaTwitter size={24} />
-          <span className="font-semibold text-sm">Twitter</span>
-        </a>
+        {["instagram", "facebook", "twitter"].map((platform) => (
+          <a
+            key={platform}
+            href={`https://${platform}.com`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-4 bg-white text-black py-2 px-4 rounded-full shadow-xl transform transition duration-300 hover:scale-105 hover:bg-yellow-500 hover:text-black w-3/4 sm:w-auto hover:shadow-2xl hover:rotate-3"
+          >
+            {platform === "instagram" && <FaInstagram size={24} />}
+            {platform === "facebook" && <FaFacebook size={24} />}
+            {platform === "twitter" && <FaTwitter size={24} />}
+            <span className="font-semibold text-sm">{platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
+          </a>
+        ))}
       </div>
 
       {/* Card de Convite para Avaliação */}
       {avaliacaoStep === 1 && (
         <div className="bg-white p-6 rounded-xl shadow-2xl w-full sm:w-96 mb-12 text-center">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Como foi a sua experiência?</h2>
-          <p className="text-gray-600 mb-4">
-            Compartilhe sua opinião.
-          </p>
+          <p className="text-gray-600 mb-4">Compartilhe sua opinião.</p>
           <button
             onClick={handleNextStep}
             className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg w-full sm:w-auto"
@@ -216,7 +200,9 @@ const LinkNaBio: React.FC = () => {
               className="mr-2"
             />
             <span className="text-base text-justify text-gray-600">
-              Eu aceito a <span className="font-semibold text-gray-800">política de privacidade</span> e concordo com o uso da minha <span className="font-semibold text-gray-800">opinião</span> e o armazenamento dos meus dados, seguindo as normas da <span className="font-semibold text-gray-800">LGPD</span>.
+              Eu aceito a <span className="font-semibold text-gray-800">política de privacidade</span> e
+              concordo com o uso da minha <span className="font-semibold text-gray-800">opinião</span> e o
+              armazenamento dos meus dados, seguindo as normas da <span className="font-semibold text-gray-800">LGPD</span>.
             </span>
           </div>
           <button
