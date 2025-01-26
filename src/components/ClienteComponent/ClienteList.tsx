@@ -62,21 +62,22 @@ const ClienteList: React.FC<ClienteListProps> = ({ searchQuery, onSelectClient }
     try {
       const clientRef = doc(db, 'clientes', id);
       await updateDoc(clientRef, updatedData);
+
       setClientes((prevClientes) =>
         prevClientes.map((cliente) =>
           cliente.id === id ? { ...cliente, ...updatedData } : cliente
         )
       );
+      console.log('Cliente atualizado com sucesso.');
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
     }
   };
 
   const filteredClients = clientes.filter((cliente) =>
-    cliente.name && typeof cliente.name === 'string' && cliente.name.toLowerCase().includes(searchQuery?.toLowerCase() || '')
+    cliente.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Garantindo que o retorno seja JSX válido
   return (
     <ul className="bg-white shadow-md rounded p-4">
       {filteredClients.map((cliente) => (
@@ -89,13 +90,19 @@ const ClienteList: React.FC<ClienteListProps> = ({ searchQuery, onSelectClient }
           <span className="text-gray-500 text-sm">{cliente.email}</span>
           <div className="ml-2 flex space-x-2">
             <button
-              onClick={() => handleUpdate(cliente.id, { name: 'Novo Nome' })}
+              onClick={(e) => {
+                e.stopPropagation(); // Evitar que o onClick do item da lista seja disparado
+                handleUpdate(cliente.id, { name: 'Novo Nome' });
+              }}
               className="text-blue-500 hover:text-blue-700"
             >
               Editar
             </button>
             <button
-              onClick={() => handleDelete(cliente.id)}
+              onClick={(e) => {
+                e.stopPropagation(); // Evitar que o onClick do item da lista seja disparado
+                handleDelete(cliente.id);
+              }}
               className="text-red-500 hover:text-red-700"
             >
               Excluir
