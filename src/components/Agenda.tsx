@@ -16,7 +16,7 @@ interface Evento {
 
 const Agenda = () => {
     const [eventos, setEventos] = useState<Evento[]>([]);
-    const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date());
+    const [dataSelecionada, setDataSelecionada] = useState<Date | null>(new Date());
     const [eventosDoDia, setEventosDoDia] = useState<Evento[]>([]);
 
     // Função para buscar os eventos do Firestore
@@ -62,12 +62,14 @@ const Agenda = () => {
 
     // Filtrar os eventos para o dia selecionado
     useEffect(() => {
-        const eventosDia = eventos.filter(evento => isSameDay(evento.data, dataSelecionada));
-        setEventosDoDia(eventosDia);
+        if (dataSelecionada) {
+            const eventosDia = eventos.filter(evento => isSameDay(evento.data, dataSelecionada));
+            setEventosDoDia(eventosDia);
+        }
     }, [dataSelecionada, eventos]);
 
     // Função para tratar a mudança de data no calendário
-    const handleDateChange = (date: Date) => {
+    const handleDateChange = (date: Date | null) => {
         setDataSelecionada(date);
     };
 
@@ -91,7 +93,7 @@ const Agenda = () => {
             {/* Exibição da data selecionada */}
             <div className="mb-6 text-center">
                 <h2 className="text-2xl font-semibold text-blue-600">
-                    {format(dataSelecionada, 'dd/MM/yyyy')} - {calcularDias(dataSelecionada)}
+                    {dataSelecionada ? format(dataSelecionada, 'dd/MM/yyyy') : 'Data não selecionada'} - {dataSelecionada ? calcularDias(dataSelecionada) : ''}
                 </h2>
             </div>
 
