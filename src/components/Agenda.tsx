@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { db } from "../services/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { Plus, Trash2 } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -214,72 +213,55 @@ const Agenda = () => {
         </Dialog>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Calendário</CardTitle>
-            <CardDescription>Selecione uma data para visualizar os eventos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={dataSelecionada}
-              onSelect={(date) => date && setDataSelecionada(date)}
-              className="rounded-md border"
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Eventos do Dia</CardTitle>
-            <CardDescription>
-              {dataSelecionada.toLocaleDateString('pt-BR', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {eventos.length > 0 ? (
-                eventos.map((evento, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 rounded-lg border"
-                  >
-                    <div className="space-y-1">
-                      <p className="font-medium">{evento.cliente}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {evento.origem} → {evento.destino}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {evento.data.toLocaleTimeString()}
-                      </p>
-                      {evento.valor && (
-                        <p className="text-sm font-medium">R$ {evento.valor}</p>
-                      )}
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => handleDeleteEvento(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle>Eventos do Dia</CardTitle>
+          <CardDescription>
+            {dataSelecionada.toLocaleDateString('pt-BR', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {eventos.length > 0 ? (
+              eventos.map((evento, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 rounded-lg border"
+                >
+                  <div className="space-y-1">
+                    <p className="font-medium">{evento.cliente}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {evento.origem} → {evento.destino}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {evento.data.toLocaleTimeString()}
+                    </p>
+                    {evento.valor && (
+                      <p className="text-sm font-medium">R$ {evento.valor}</p>
+                    )}
                   </div>
-                ))
-              ) : (
-                <p className="text-muted-foreground text-center py-4">
-                  Nenhum evento cadastrado para esta data.
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => handleDeleteEvento(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-center py-4">
+                Nenhum evento cadastrado para esta data.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
