@@ -2,6 +2,8 @@ import React from 'react';
 import { Cliente } from './ClienteSearch'; // Tipo Cliente atualizado
 import { db } from '../../services/firebase';
 import { doc, deleteDoc } from 'firebase/firestore';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'; // Componentes Table do shadcn
+import { Button } from '../ui/button'; // Componente Button do shadcn
 
 interface ClienteListProps {
   clients: Cliente[];
@@ -22,43 +24,53 @@ const ClienteList: React.FC<ClienteListProps> = ({ clients, onSelectClient }) =>
   };
 
   return (
-    <ul>
-      {clients.map((client) => (
-        <li key={client.id} className="border-b py-2">
-          {/* Exibição do nome e sobrenome do cliente */}
-          <span className="font-bold">{client.nome} {client.sobrenome}</span>
-
-          {/* Exibindo o e-mail */}
-          <div>{client.email}</div>
-
-          {/* Exibindo o endereço completo */}
-          <div>
-            {client.endereco.rua}, {client.endereco.numero} {client.endereco.complemento && `- ${client.endereco.complemento}`}<br />
-            {client.endereco.bairro} - {client.endereco.cidade}, {client.endereco.estado} - {client.endereco.pais}<br />
-            CEP: {client.endereco.cep}
-          </div>
-
-          {/* Exibindo observações */}
-          <div className="text-gray-500">{client.observacoes || 'Sem observações'}</div>
-
-          {/* Botões de editar e excluir */}
-          <div className="mt-2">
-            <button
-              onClick={() => onSelectClient(client)}
-              className="bg-blue-600 text-white px-4 py-2 rounded mr-2"
-            >
-              Editar
-            </button>
-            <button
-              onClick={() => handleDelete(client.id)}
-              className="bg-red-600 text-white px-4 py-2 rounded"
-            >
-              Excluir
-            </button>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nome</TableHead>
+          <TableHead>Sobrenome</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Endereço</TableHead>
+          <TableHead>Observações</TableHead>
+          <TableHead>Ações</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {clients.map((client) => (
+          <TableRow key={client.id}>
+            <TableCell>{client.nome}</TableCell>
+            <TableCell>{client.sobrenome}</TableCell>
+            <TableCell>{client.email}</TableCell>
+            <TableCell>
+              {client.endereco.rua}, {client.endereco.numero}{' '}
+              {client.endereco.complemento && `- ${client.endereco.complemento}`}
+              <br />
+              {client.endereco.bairro} - {client.endereco.cidade}, {client.endereco.estado} -{' '}
+              {client.endereco.pais}
+              <br />
+              CEP: {client.endereco.cep}
+            </TableCell>
+            <TableCell>{client.observacoes || 'Sem observações'}</TableCell>
+            <TableCell>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => onSelectClient(client)}
+                >
+                  Editar
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleDelete(client.id)}
+                >
+                  Excluir
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 

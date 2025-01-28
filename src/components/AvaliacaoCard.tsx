@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button"; // Importando o componente Button do shadcn/ui
+import { Card, CardContent, CardFooter } from "@/components/ui/card"; // Importando componentes de Card do shadcn/ui
+import { Star } from "lucide-react"; // Importando ícone de estrela do Lucide
 import { Avaliacao } from "../services/avaliacoes";
 
 interface AvaliacaoCardProps {
@@ -26,44 +29,41 @@ const AvaliacaoCard: React.FC<AvaliacaoCardProps> = ({
     : "Data não disponível";
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105">
-      <p className="font-medium text-lg text-blue-600">{avaliacao.nome}</p>
-      <div className="flex items-center mt-2">
-        {Array.from({ length: avaliacao.estrelas }).map((_, i) => (
-          <svg
-            key={i}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            className="text-yellow-500"
-          >
-            <path d="M12 17.25l6.474 3.522-1.646-7.137 5.307-4.625-7.444-.104L12 .25 9.309 8.931 1.865 9.036l5.307 4.625-1.646 7.137L12 17.25z" />
-          </svg>
-        ))}
-      </div>
-      <p className="text-gray-600 mt-2">{avaliacao.comentario}</p>
-      <p className="text-sm text-gray-500 mt-1">{formattedDate}</p>
+    <Card className="hover:shadow-xl transition-shadow duration-300">
+      <CardContent className="p-6">
+        <p className="font-medium text-lg text-blue-600">{avaliacao.nome}</p>
+        <div className="flex items-center mt-2">
+          {Array.from({ length: avaliacao.estrelas }).map((_, i) => (
+            <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
+          ))}
+        </div>
+        <p className="text-gray-600 mt-2">{avaliacao.comentario}</p>
+        <p className="text-sm text-gray-500 mt-1">{formattedDate}</p>
+      </CardContent>
       {!showArchived && (
-        <div className="flex justify-between mt-4">
+        <CardFooter className="flex justify-between p-6 pt-0">
           {avaliacao.status === "publicado" ? (
             <span className="text-green-600">Publicado</span>
           ) : (
-            <button
+            <Button
               onClick={onPublish}
               disabled={isLoading}
-              className="text-blue-600 hover:text-blue-800 disabled:opacity-50"
+              variant="ghost"
+              className="text-blue-600 hover:text-blue-800"
             >
               {isLoading ? "Publicando..." : "Publicar"}
-            </button>
+            </Button>
           )}
-          <button onClick={onArchive} className="text-yellow-600 hover:text-yellow-700">
+          <Button
+            onClick={onArchive}
+            variant="ghost"
+            className="text-yellow-600 hover:text-yellow-700"
+          >
             Arquivar
-          </button>
-        </div>
+          </Button>
+        </CardFooter>
       )}
-    </div>
+    </Card>
   );
 };
 

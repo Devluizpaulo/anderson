@@ -79,6 +79,15 @@ const Header: React.FC = () => {
                 <span>CPanel</span>
               </Link>
             </li>
+            <li>
+              <Link
+                href="/dashboard"
+                className="flex items-center space-x-2 hover:text-yellow-400 transition-colors"
+              >
+                <FaBuilding size={24} className="text-white" />
+                <span>dashboard</span>
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Input } from '../ui/input'; // Importe o componente Input do shadcn
 
 export interface Endereco {
   rua: string;
@@ -35,12 +36,12 @@ const ClienteSearch: React.FC<ClienteSearchProps> = ({ onSearch }) => {
 
   return (
     <div className="mb-4">
-      <input
+      <Input
         type="text"
         value={searchQuery}
         onChange={handleInputChange}
         placeholder="Buscar cliente por nome, e-mail ou endereço"
-        className="border p-2 w-full rounded"
+        className="w-full" // O Input do shadcn já vem estilizado, mas você pode adicionar classes personalizadas
       />
     </div>
   );

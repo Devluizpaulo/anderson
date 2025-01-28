@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ClienteForm from './ClienteForm';
 import ClienteList from './ClienteList';
-import ClienteSearch from './ClienteSearch';
+import ClienteSearch from './ClienteSearch'; // Importação corrigida
 import { db } from '../../services/firebase';
 import { collection, getDocs } from 'firebase/firestore';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'; // Importe os componentes do shadcn
 
-// Interface atualizada para refletir a nova estrutura do cliente
 interface Cliente {
   id: string;
   nome: string;
@@ -54,7 +54,6 @@ const Clientes: React.FC = () => {
     setSelectedClient(client);
   };
 
-  // Filtrando os clientes com base no nome (agora considerando 'nome' e 'sobrenome' na busca)
   const filteredClients = clients.filter(
     (client) =>
       client.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -62,12 +61,17 @@ const Clientes: React.FC = () => {
   );
 
   return (
-    <div>
-      <h1>Clientes</h1>
-      <ClienteSearch onSearch={handleSearch} />
-      {/* Passando selectedClient para o ClienteForm */}
-      <ClienteForm selectedClient={selectedClient} onSubmit={() => setSelectedClient(null)} />
-      <ClienteList clients={filteredClients} onSelectClient={handleSelectClient} />
+    <div className="p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Clientes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ClienteSearch onSearch={handleSearch} />
+          <ClienteForm selectedClient={selectedClient} onSubmit={() => setSelectedClient(null)} />
+          <ClienteList clients={filteredClients} onSelectClient={handleSelectClient} />
+        </CardContent>
+      </Card>
     </div>
   );
 };

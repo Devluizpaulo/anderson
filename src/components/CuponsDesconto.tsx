@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../services/firebase';  // Assumindo que você já configurou o Firebase
+import { db } from '../services/firebase';
 import { collection, addDoc, updateDoc, doc, getDocs, query, where, getDoc, Timestamp } from 'firebase/firestore';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 // Função para gerar códigos de cupons exclusivos
 const generateCouponCode = () => {
@@ -24,12 +31,13 @@ const CuponsDesconto = () => {
     const [campanhas, setCampanhas] = useState<Campanha[]>([]);
     const [nomeCampanha, setNomeCampanha] = useState('');
     const [descricaoCampanha, setDescricaoCampanha] = useState('');
-    const [valorDesconto, setValorDesconto] = useState(0);
-    const [limiteCupons, setLimiteCupons] = useState(0); // Limite de cupons
+    const [valorDesconto, setValorDesconto] = useState(5);
+    const [limiteCupons, setLimiteCupons] = useState(0);
     const [dataInicio, setDataInicio] = useState('');
     const [dataFim, setDataFim] = useState('');
-    const [statusCampanha, setStatusCampanha] = useState('ativo'); // Inicializando o status
-    const [customValorDesconto, setCustomValorDesconto] = useState(''); // Valor personalizado
+    const [statusCampanha, setStatusCampanha] = useState('ativo');
+    const [customValorDesconto, setCustomValorDesconto] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     // Buscar campanhas do Firebase
     const fetchCampanhas = async () => {
@@ -48,29 +56,57 @@ const CuponsDesconto = () => {
         const cuponsRef = collection(db, 'cupons');
         const q = query(cuponsRef, where("campanha_id", "==", campanhaId));
         const cuponsSnap = await getDocs(q);
-        const cuponsEmitidos = cuponsSnap.size;
-        return cuponsEmitidos;
+        return cuponsSnap.size;
     };
 
     // Criar nova campanha
     const handleCriarCampanha = async () => {
+        if (!nomeCampanha || !descricaoCampanha || !dataInicio || !dataFim || limiteCupons <= 0) {
+            toast({
+                title: "Erro",
+                description: "Preencha todos os campos obrigatórios.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        if (new Date(dataInicio) >= new Date(dataFim)) {
+            toast({
+                title: "Erro",
+                description: "A data de início deve ser anterior à data de fim.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setIsLoading(true);
+
         const novaCampanha = {
             nome: nomeCampanha,
             descricao: descricaoCampanha,
-            valor_desconto: customValorDesconto ? customValorDesconto : valorDesconto,
-            limite_cupons: limiteCupons, // Limite de cupons
-            quantidade_cupons: 0, // Inicialmente, 0 cupons gerados
+            valor_desconto: customValorDesconto ? Number(customValorDesconto) : valorDesconto,
+            limite_cupons: limiteCupons,
+            quantidade_cupons: 0,
             inicio: Timestamp.fromDate(new Date(dataInicio)),
             fim: Timestamp.fromDate(new Date(dataFim)),
-            status: statusCampanha, // Passando o valor do status
+            status: statusCampanha,
         };
 
         try {
             await addDoc(collection(db, 'campanhas'), novaCampanha);
-            alert('Campanha criada com sucesso!');
-            fetchCampanhas();  // Recarregar campanhas
+            toast({
+                title: "Sucesso",
+                description: "Campanha criada com sucesso!",
+            });
+            fetchCampanhas();
         } catch (e) {
-            alert('Erro ao criar campanha: ' + e);
+            toast({
+                title: "Erro",
+                description: "Erro ao criar campanha: " + e,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -81,177 +117,189 @@ const CuponsDesconto = () => {
         const campanhaData = campanhaSnap.data();
 
         if (!campanhaData) {
-            alert('Campanha não encontrada!');
+            toast({
+                title: "Erro",
+                description: "Campanha não encontrada!",
+                variant: "destructive",
+            });
             return;
         }
 
-        // Verifica a quantidade de cupons restantes
         const cuponsEmitidos = await checkCuponsRestantes(campanhaId);
         const cuponsRestantes = campanhaData.limite_cupons - cuponsEmitidos;
 
         if (cuponsRestantes <= 0) {
-            alert('Limite de cupons já atingido!');
+            toast({
+                title: "Erro",
+                description: "Limite de cupons já atingido!",
+                variant: "destructive",
+            });
             return;
         }
 
-        // Gera cupons
-        for (let i = 0; i < cuponsRestantes; i++) {
-            const codigoCupom = generateCouponCode();
-            const cupom = {
-                codigo: codigoCupom,
-                campanha_id: campanhaId,
-                cpf_celular: '',
-                usado: false,
-                data_resgate: null,
-            };
+        setIsLoading(true);
 
-            await addDoc(collection(db, 'cupons'), cupom);
+        try {
+            for (let i = 0; i < cuponsRestantes; i++) {
+                const codigoCupom = generateCouponCode();
+                const cupom = {
+                    codigo: codigoCupom,
+                    campanha_id: campanhaId,
+                    cpf_celular: '',
+                    usado: false,
+                    data_resgate: null,
+                };
+                await addDoc(collection(db, 'cupons'), cupom);
+            }
+
+            await updateDoc(campanhaRef, { quantidade_cupons: cuponsEmitidos + cuponsRestantes });
+            toast({
+                title: "Sucesso",
+                description: "Cupons gerados com sucesso!",
+            });
+            fetchCampanhas();
+        } catch (e) {
+            toast({
+                title: "Erro",
+                description: "Erro ao gerar cupons: " + e,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
         }
-
-        // Atualiza a quantidade de cupons gerados na campanha
-        await updateDoc(campanhaRef, { quantidade_cupons: cuponsEmitidos + cuponsRestantes });
-
-        alert('Cupons gerados com sucesso!');
-        fetchCampanhas();  // Recarregar campanhas
     };
 
     return (
         <div className="max-w-4xl mx-auto p-6">
             <h2 className="text-3xl font-semibold mb-6">Cupons de Desconto</h2>
-            <div className="bg-white p-6 rounded-lg shadow-xl">
-                <h3 className="text-2xl font-semibold mb-4">Criar Campanha</h3>
 
-                {/* Formulário de Criação de Campanha */}
-                <div className="p-6 shadow-xl mb-6 grid grid-cols-2 gap-6">
+            {/* Formulário de Criação de Campanha */}
+            <Card className="mb-6">
+                <CardHeader>
+                    <CardTitle>Criar Campanha</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-lg font-medium mb-2" htmlFor="nomeCampanha">Nome da Campanha</label>
-                        <input
+                        <Label htmlFor="nomeCampanha">Nome da Campanha</Label>
+                        <Input
                             id="nomeCampanha"
-                            type="text"
                             value={nomeCampanha}
                             onChange={(e) => setNomeCampanha(e.target.value)}
                             placeholder="Digite o nome da campanha"
-                            className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-
-                    {/* Descrição da Campanha */}
                     <div>
-                        <label className="block text-lg font-medium mb-2" htmlFor="descricaoCampanha">Descrição da Campanha</label>
-                        <textarea
+                        <Label htmlFor="descricaoCampanha">Descrição da Campanha</Label>
+                        <Input
                             id="descricaoCampanha"
                             value={descricaoCampanha}
                             onChange={(e) => setDescricaoCampanha(e.target.value)}
                             placeholder="Descreva os detalhes da campanha"
-                            className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-
-                    {/* Valor do Desconto (lista de 5%, 10%, 15%, ... até 90% e campo personalizado) */}
                     <div>
-                        <label className="block text-lg font-medium mb-2" htmlFor="valorDesconto">Valor do Desconto</label>
-                        <div className="flex space-x-4">
-                            <select
-                                id="valorDesconto"
-                                value={valorDesconto}
-                                onChange={(e) => setValorDesconto(Number(e.target.value))}
-                                className="w-1/2 p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        <Label htmlFor="valorDesconto">Valor do Desconto</Label>
+                        <div className="flex gap-2">
+                            <Select
+                                value={valorDesconto.toString()}
+                                onValueChange={(value) => setValorDesconto(Number(value))}
                             >
-                                {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90].map((valor) => (
-                                    <option key={valor} value={valor}>{valor}%</option>
-                                ))}
-                            </select>
-                            <input
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90].map((valor) => (
+                                        <SelectItem key={valor} value={valor.toString()}>{valor}%</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Input
                                 id="customValorDesconto"
                                 type="number"
                                 value={customValorDesconto}
                                 onChange={(e) => setCustomValorDesconto(e.target.value)}
-                                placeholder="Digite um valor personalizado"
-                                className="w-1/2 p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Valor personalizado"
                             />
                         </div>
                     </div>
-
-                    {/* Status da Campanha */}
                     <div>
-                        <label className="block text-lg font-medium mb-2" htmlFor="statusCampanha">Status da Campanha</label>
-                        <select
-                            id="statusCampanha"
+                        <Label htmlFor="statusCampanha">Status da Campanha</Label>
+                        <Select
                             value={statusCampanha}
-                            onChange={(e) => setStatusCampanha(e.target.value)}
-                            className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onValueChange={(value) => setStatusCampanha(value)}
                         >
-                            <option value="ativo">Ativo</option>
-                            <option value="inativo">Inativo</option>
-                        </select>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="ativo">Ativo</SelectItem>
+                                <SelectItem value="inativo">Inativo</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
-
-                    {/* Limite de Cupons */}
                     <div>
-                        <label className="block text-lg font-medium mb-2" htmlFor="limiteCupons">Limite de Cupons</label>
-                        <input
+                        <Label htmlFor="limiteCupons">Limite de Cupons</Label>
+                        <Input
                             id="limiteCupons"
                             type="number"
                             value={limiteCupons}
                             onChange={(e) => setLimiteCupons(Number(e.target.value))}
                             placeholder="Número máximo de cupons"
-                            className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-
-                    {/* Data de Início */}
                     <div>
-                        <label className="block text-lg font-medium mb-2" htmlFor="dataInicio">Data de Início</label>
-                        <input
+                        <Label htmlFor="dataInicio">Data de Início</Label>
+                        <Input
                             id="dataInicio"
                             type="date"
                             value={dataInicio}
                             onChange={(e) => setDataInicio(e.target.value)}
-                            className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-
-                    {/* Data de Fim */}
                     <div>
-                        <label className="block text-lg font-medium mb-2" htmlFor="dataFim">Data de Fim</label>
-                        <input
+                        <Label htmlFor="dataFim">Data de Fim</Label>
+                        <Input
                             id="dataFim"
                             type="date"
                             value={dataFim}
                             onChange={(e) => setDataFim(e.target.value)}
-                            className="w-full p-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-
-                    <div className="col-span-2">
-                        <button
-                            onClick={handleCriarCampanha}
-                            className="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 w-full"
-                        >
-                            Criar Campanha
-                        </button>
-                    </div>
-                </div>
-            </div>
+                </CardContent>
+                <CardFooter>
+                    <Button onClick={handleCriarCampanha} disabled={isLoading} className="w-full">
+                        {isLoading ? "Criando..." : "Criar Campanha"}
+                    </Button>
+                </CardFooter>
+            </Card>
 
             {/* Listagem de Campanhas Criadas */}
-            <div className="mt-8">
+            <div>
                 <h3 className="text-2xl font-semibold mb-4">Campanhas Criadas</h3>
                 {campanhas.map(campanha => (
-                    <div key={campanha.id} className="mb-4 p-4 shadow-lg rounded-lg">
-                        <h4 className="text-xl font-semibold">{campanha.nome}</h4>
-                        <p>{campanha.descricao}</p>
-                        <p>Valor de Desconto: {campanha.valor_desconto}%</p>
-                        <p>Status: {campanha.status}</p>
-                        <button
-                            onClick={() => handleGerarCupons(campanha.id)}
-                            className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
-                        >
-                            Gerar Cupons
-                        </button>
-                    </div>
+                    <Card key={campanha.id} className="mb-4">
+                        <CardHeader>
+                            <CardTitle>{campanha.nome}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p>{campanha.descricao}</p>
+                            <p>Valor de Desconto: {campanha.valor_desconto}%</p>
+                            <p>Status: {campanha.status}</p>
+                        </CardContent>
+                        <CardFooter>
+                            <Button
+                                onClick={() => handleGerarCupons(campanha.id)}
+                                disabled={isLoading}
+                            >
+                                Gerar Cupons
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 ))}
             </div>
+
+            {/* Renderizar o Toaster */}
+            <Toaster />
         </div>
     );
 };

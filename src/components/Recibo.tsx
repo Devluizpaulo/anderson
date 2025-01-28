@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 // Componente Recibo
 const Recibo: React.FC = () => {
@@ -22,9 +26,11 @@ const Recibo: React.FC = () => {
   // Renderizar o recibo
   const renderRecibo = () => {
     return (
-      <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
-        <h3 className="text-2xl font-semibold text-center text-gray-800">Recibo de Corrida</h3>
-        <div className="mt-6">
+      <Card className="max-w-2xl mx-auto p-6 mt-6">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">Recibo de Corrida</CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="grid grid-cols-2 gap-6 mb-4">
             <p><strong>Número do Recibo:</strong> {numeroRecibo}</p>
             <p><strong>Cliente:</strong> {clienteNome}</p>
@@ -43,8 +49,8 @@ const Recibo: React.FC = () => {
             <p><strong>Nome do Motorista:</strong> {motoristaNome}</p>
             <p><strong>CPF ou CNPJ do Motorista:</strong> {motoristaCpfCnpj}</p>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   };
 
@@ -53,98 +59,105 @@ const Recibo: React.FC = () => {
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">Emitir Recibo</h2>
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Nome do Cliente</label>
-          <input
+          <Label htmlFor="clienteNome">Nome do Cliente</Label>
+          <Input
+            id="clienteNome"
             type="text"
             value={clienteNome}
             onChange={(e) => setClienteNome(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Telefone do Cliente</label>
-          <input
+          <Label htmlFor="clienteTelefone">Telefone do Cliente</Label>
+          <Input
+            id="clienteTelefone"
             type="text"
             value={clienteTelefone}
             onChange={(e) => setClienteTelefone(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Início da Corrida</label>
-          <input
+          <Label htmlFor="inicioCorrida">Início da Corrida</Label>
+          <Input
+            id="inicioCorrida"
             type="datetime-local"
             value={inicioCorrida}
             onChange={(e) => setInicioCorrida(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Fim da Corrida</label>
-          <input
+          <Label htmlFor="fimCorrida">Fim da Corrida</Label>
+          <Input
+            id="fimCorrida"
             type="datetime-local"
             value={fimCorrida}
             onChange={(e) => setFimCorrida(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Valor da Corrida (R$)</label>
-          <input
+          <Label htmlFor="valorCorrida">Valor da Corrida (R$)</Label>
+          <Input
+            id="valorCorrida"
             type="number"
             value={valorCorrida}
             onChange={(e) => setValorCorrida(Number(e.target.value))}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
 
         {/* Dados do Motorista */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Nome do Motorista</label>
-          <input
+          <Label htmlFor="motoristaNome">Nome do Motorista</Label>
+          <Input
+            id="motoristaNome"
             type="text"
             value={motoristaNome}
             onChange={(e) => setMotoristaNome(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">CPF ou CNPJ do Motorista</label>
-          <input
+          <Label htmlFor="motoristaCpfCnpj">CPF ou CNPJ do Motorista</Label>
+          <Input
+            id="motoristaCpfCnpj"
             type="text"
             value={motoristaCpfCnpj}
             onChange={(e) => setMotoristaCpfCnpj(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Placa do Carro</label>
-          <input
+          <Label htmlFor="placaCarro">Placa do Carro</Label>
+          <Input
+            id="placaCarro"
             type="text"
             value={placaCarro}
             onChange={(e) => setPlacaCarro(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Modelo do Carro</label>
-          <input
+          <Label htmlFor="modeloCarro">Modelo do Carro</Label>
+          <Input
+            id="modeloCarro"
             type="text"
             value={modeloCarro}
             onChange={(e) => setModeloCarro(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1"
           />
         </div>
       </div>
 
-      <button
-        onClick={() => {
-          gerarNumeroRecibo();
-        }}
-        className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 focus:ring-4 focus:ring-blue-300"
+      <Button
+        onClick={gerarNumeroRecibo}
+        className="mt-6"
       >
         Gerar Recibo
-      </button>
+      </Button>
 
       {/* Exibir Recibo gerado */}
       {numeroRecibo && renderRecibo()}
