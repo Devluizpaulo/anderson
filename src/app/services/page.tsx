@@ -19,8 +19,9 @@ const Services: React.FC = () => {
             Tipos de Atendimento
           </h2>
           <p className="text-base sm:text-lg mb-12 text-gray-600 mx-auto max-w-4xl text-center">
-            Oferecemos uma ampla gama de serviços de transporte, cuidadosamente adaptados às suas necessidades. Cada detalhe é planejado para garantir conforto, segurança e eficiência. Descubra a experiência única que preparamos para você.
+            Meu compromisso é oferecer um serviço de transporte personalizado, pensado para garantir sua comodidade, segurança e eficiência. Cada detalhe é planejado para que sua experiência seja impecável, seja em viagens de negócios, lazer ou compromissos especiais.
           </p>
+
 
           {/* Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
@@ -38,8 +39,7 @@ const Services: React.FC = () => {
                 Transfer Receptivo em Aeroportos
               </h3>
               <p className="text-gray-600 text-base sm:text-lg text-justify">
-                Aproveite um serviço de transporte eficiente e pontual para chegadas e partidas em aeroportos. Incluímos recepção personalizada e assistência para garantir tranquilidade durante todo o trajeto. Nossa equipe de motoristas está sempre pronta para oferecer o melhor atendimento.
-              </p>
+                Garanto um transporte eficiente e pontual para sua chegada ou partida no aeroporto. Estarei pronto para recebê-lo, auxiliando no que for necessário para que seu trajeto seja tranquilo e sem preocupações.  </p>
             </div>
 
             {/* Card 2 */}
@@ -55,7 +55,7 @@ const Services: React.FC = () => {
                 Atendimento em Litoral e Interior
               </h3>
               <p className="text-gray-600 text-base sm:text-lg text-justify">
-                Ideal para férias ou escapadas rápidas, nosso transporte oferece segurança e conforto em viagens para o litoral ou interior. Relaxe enquanto cuidamos de cada detalhe do seu percurso, seja para uma viagem de negócios ou lazer. Garantimos um transporte pontual e sem preocupações.
+                Precisa viajar para o litoral ou interior? Cuido de tudo para que sua viagem seja segura e confortável. Seja para lazer ou compromissos profissionais, estou aqui para proporcionar um trajeto tranquilo e sem preocupações.
               </p>
             </div>
 
@@ -71,8 +71,7 @@ const Services: React.FC = () => {
               <h3 className="text-xl sm:text-2xl font-semibold text-blue-600 mb-4">
                 Atendimento Executivo
               </h3>
-              <p className="text-gray-600 text-base sm:text-lg text-justify">
-                Para profissionais que exigem excelência, nosso atendimento executivo combina discrição e pontualidade com veículos de alto padrão, projetados para atender às suas necessidades. Se você busca conforto e eficiência para suas reuniões ou viagens de negócios, temos a solução perfeita para você.
+              <p className="text-gray-600 text-base sm:text-lg text-justify">Se você busca um transporte executivo que una discrição, pontualidade e conforto, eu tenho a solução ideal. Com um serviço de alto padrão, garanto que sua viagem de negócios ou reunião seja tranquila e eficiente.
               </p>
             </div>
             {/* Card 4 */}
@@ -88,7 +87,7 @@ const Services: React.FC = () => {
                 Recepção ao Turismo em São Paulo
               </h3>
               <p className="text-gray-600 text-base sm:text-lg text-justify">
-                Explore São Paulo com um serviço especializado para turistas. Oferecemos transporte confortável para passeios culturais, compras e visitas às principais atrações da cidade. Nossa equipe tem o conhecimento local para garantir que você aproveite ao máximo sua estadia na cidade.
+                Descubra São Paulo com todo o conforto e segurança. Conheço a cidade como ninguém e estou pronto para guiá-lo pelos melhores pontos turísticos, passeios culturais e experiências únicas. Deixe que eu cuide do transporte enquanto você aproveita o que a cidade tem de melhor..
               </p>
             </div>
           </div>

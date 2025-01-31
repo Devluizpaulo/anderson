@@ -62,62 +62,67 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Qualidades do Atendimento */}
-      <section className="py-16 bg-white">
+      {/* Diferenciais do Atendimento */}
+      <section className="py-16 text-black">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-gray-800 text-center">
-            Qualidades do Atendimento
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center text-black">
+            Compromisso com a Excelência
           </h2>
-          <p className="text-base sm:text-lg mb-12 text-gray-600 mx-auto max-w-4xl text-center">
-            No meu serviço de transporte, prezo pela excelência e pelo conforto de cada cliente. Cada viagem é pensada para proporcionar uma experiência única, com atenção aos mínimos detalhes e com um serviço que faz você se sentir especial. Conheça as qualidades que faço questão de oferecer em cada atendimento:
+          <p className="text-base sm:text-lg mb-12 text-center max-w-3xl mx-auto opacity-90">
+            Cada viagem que planejo para você é pensada com o máximo cuidado, buscando sempre segurança, conforto e um atendimento excepcional. Conheça os diferenciais que tornam o meu serviço único e inesquecível:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-12">
-            {[{
-              icon: <FaShieldAlt size={40} color="#4CAF50" />,
-              title: "Segurança",
-              description: "Eu me preocupo com sua segurança acima de tudo. Com veículos revisados regularmente e monitoramento constante, você pode relaxar sabendo que está em boas mãos.",
-            },
-            {
-              icon: <FaClock size={40} color="#FF9800" />,
-              title: "Pontualidade",
-              description: "A pontualidade é essencial para mim. Eu me esforço para estar sempre no horário combinado, para que você nunca tenha que se preocupar com atrasos em seus compromissos.",
-            },
-            {
-              icon: <FaRegUser size={40} color="#2196F3" />,
-              title: "Discrição",
-              description: "Seja para viagens executivas ou pessoais, sei como é importante preservar a sua privacidade. Eu mantenho a discrição em todas as situações, garantindo que sua viagem seja tranquila e sem interrupções.",
-            },
-            {
-              icon: <FaTrophy size={40} color="#FF5722" />,
-              title: "Profissionalismo",
-              description: "Com muitos anos de experiência, minha missão é oferecer um serviço profissional de alta qualidade, sempre atento às suas necessidades, com respeito e cordialidade.",
-            },
-            {
-              icon: <FaCogs size={40} color="#9C27B0" />,
-              title: "Conforto",
-              description: "Proporciono uma experiência confortável em cada viagem. Meus veículos são equipados com itens de luxo para garantir que você viaje com todo o conforto que merece.",
-            },
-            {
-              icon: <FaHandshake size={40} color="#3F51B5" />,
-              title: "Atendimento Personalizado",
-              description: "Cada cliente é único. Por isso, personalizo o atendimento de acordo com suas preferências, oferecendo um serviço sob medida para garantir a sua satisfação.",
-            }].map((quality, index) => (
-              <div key={index} className="bg-gray-50 p-6 sm:p-8 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-105">
-                <div className="flex items-center mb-4">
-                  {quality.icon}
-                  <h3 className="text-xl sm:text-2xl font-semibold text-blue-600 ml-4">
-                    {quality.title}
-                  </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+            {[
+              {
+                icon: <FaShieldAlt size={45} className="text-green-500" />,
+                title: "Segurança em Primeiro Lugar",
+                description: "Com a minha atenção constante à segurança, garanto que você viaje com total tranquilidade. Meus veículos passam por manutenções rigorosas e possuem monitoramento 24/7.",
+              },
+              {
+                icon: <FaClock size={45} className="text-orange-500" />,
+                title: "Pontualidade Garantida",
+                description: "Seu tempo é precioso para mim. Me comprometo a ser pontual, com o objetivo de você cumprir sua agenda sem contratempos ou atrasos.",
+              },
+              {
+                icon: <FaRegUser size={45} className="text-blue-500" />,
+                title: "Total Discrição",
+                description: "Eu entendo a importância da sua privacidade. Ofereço um atendimento discreto e profissional, seja para viagens pessoais ou corporativas.",
+              },
+              {
+                icon: <FaTrophy size={45} className="text-red-500" />,
+                title: "Profissionalismo",
+                description: "Com ampla experiência, meu compromisso é entregar um serviço impecável, sempre atento aos detalhes e com o mais alto padrão de cortesia e respeito.",
+              },
+              {
+                icon: <FaCogs size={45} className="text-purple-500" />,
+                title: "Conforto e Qualidade",
+                description: "Os meus veículos são equipados com o que há de melhor para garantir a sua experiência mais confortável e sofisticada durante toda a viagem.",
+              },
+              {
+                icon: <FaHandshake size={45} className="text-indigo-500" />,
+                title: "Atendimento Personalizado",
+                description: "Para mim, cada cliente é único. Por isso, ofereço um atendimento totalmente sob medida, focado em atender todas as suas expectativas e necessidades.",
+              },
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <div className="flex items-center mb-6">
+                  <div className="p-4 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 shadow-md">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 ml-4">{item.title}</h3>
                 </div>
                 <p className="text-gray-600 text-base sm:text-lg text-justify">
-                  {quality.description}
+                  {item.description}
                 </p>
               </div>
             ))}
           </div>
         </div>
       </section>
+
       {/* Chamando o Componente de Avaliações */}
       <ReviewSection />
       {/* Galeria */}

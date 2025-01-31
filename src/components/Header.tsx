@@ -13,7 +13,7 @@ const Header: React.FC = () => {
         {/* Logo */}
         <div className="text-3xl font-extrabold tracking-wider">
           <Link href="/" className="text-yellow-400 hover:text-yellow-300">
-            Táxi Premium
+            Anderson Executive Transfers
           </Link>
         </div>
         <button
