@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FaWhatsapp, FaSmile, FaMicrophone } from "react-icons/fa";
 import Image from "next/image"; // Importe o componente Image
+import { useLanguage } from "../context/LanguageContext";
 
 const WhatsAppButton: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Mostrar popup por um curto período
@@ -48,7 +50,7 @@ const WhatsAppButton: React.FC = () => {
 
           {/* Corpo */}
           <div className="p-3 bg-gray-50">
-            <p className="text-gray-700 text-sm">Olá! Como posso ajudá-lo?</p>
+            <p className="text-gray-700 text-sm">{t("common.whatsappPopup.greeting")}</p>
           </div>
 
           {/* Rodapé */}
@@ -56,7 +58,7 @@ const WhatsAppButton: React.FC = () => {
             <FaSmile className="text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Digite sua mensagem"
+              placeholder={t("common.whatsappPopup.placeholder")}
               className="flex-1 bg-gray-100 rounded-full px-4 py-1.5 outline-none text-sm"
               disabled
             />
@@ -71,7 +73,7 @@ const WhatsAppButton: React.FC = () => {
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 bg-green-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-green-600 hover:shadow-xl transition-all duration-300 transform hover:scale-110 pulse sm:w-16 sm:h-16"
-        title="Fale Conosco no WhatsApp"
+        title={t("common.whatsappPopup.tooltip")}
       >
         <FaWhatsapp className="w-8 h-8 sm:w-7 sm:h-7" />
         {unreadMessages > 0 && (

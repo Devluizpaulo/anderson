@@ -36,7 +36,7 @@ export const INITIAL_WHATSAPP_FORM = {
   destino: "Hotel Unique - Av. Brig. Luís Antônio, 4700",
   data: "2026-06-15",
   hora: "14:30",
-  veiculo: "Toyota Corolla Cross Blindado",
+  veiculo: "Toyota Corolla Cross Premium",
   observacoes: "Necessita de receptivo com placa no desembarque internacional."
 };
 

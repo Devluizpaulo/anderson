@@ -25,7 +25,7 @@ const Hero: React.FC = () => {
         {/* Floating badge for safety */}
         <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full flex items-center space-x-2 text-xs font-semibold tracking-wider text-yellow-500 uppercase">
           <FaShieldAlt className="text-yellow-500" />
-          <span>Frota 100% Blindada</span>
+          <span>Serviço 100% Premium</span>
         </div>
       </div>
 
@@ -46,7 +46,7 @@ const Hero: React.FC = () => {
           conforto supremo, pontualidade britânica e total discrição que o seu perfil exige.
         </p>
         <p className="text-gray-350 text-sm lg:text-base mb-8 leading-relaxed text-justify sm:text-left text-gray-400 max-w-xl">
-          Veículo blindado próprio de última geração equipados com facilidades premium para que seu trajeto seja produtivo, seguro e extremamente relaxante.
+          Veículo executivo de última geração equipado com facilidades premium para que seu trajeto seja produtivo, seguro e extremamente relaxante.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -57,7 +57,7 @@ const Hero: React.FC = () => {
             className="flex items-center justify-center gap-2.5 py-3.5 px-8 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black rounded-full text-sm font-extrabold shadow-lg shadow-yellow-500/20 transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-yellow-500/30 hover:from-yellow-300 hover:to-yellow-400"
           >
             <FaWhatsapp size={18} />
-            <span>Reserve Sua Corrida de Luxo</span>
+            <span>Reserve Sua Corrida</span>
           </a>
           
           <a

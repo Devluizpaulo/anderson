@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { db, collection, getDocs } from '../services/firebase';
 import { Star, MessageSquare } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 // Definindo o tipo para a avaliação
 interface Review {
@@ -14,6 +15,7 @@ interface Review {
 const ReviewSection: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]); // Usando o tipo Review[]
   const [loading, setLoading] = useState<boolean>(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -38,7 +40,7 @@ const ReviewSection: React.FC = () => {
   if (loading) {
     return (
       <section className="py-20 bg-gray-950 text-white border-t border-gray-900">
-        <p className="text-center text-gray-400">Carregando depoimentos...</p>
+        <p className="text-center text-gray-400">{t("home.reviews.loading")}</p>
       </section>
     );
   }
@@ -54,13 +56,13 @@ const ReviewSection: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs uppercase font-extrabold text-yellow-500 tracking-widest bg-yellow-500/10 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
             <MessageSquare className="w-3.5 h-3.5" />
-            Depoimentos
+            {t("home.reviews.badge")}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mt-4 mb-6 text-white tracking-tight">
-            O Que Nossos Clientes Dizem
+            {t("home.reviews.title")}
           </h2>
           <p className="text-gray-400 text-base sm:text-lg leading-relaxed">
-            A experiência de nossos passageiros é o pilar que sustenta nosso compromisso de oferecer sempre o melhor serviço. Veja relatos de quem viaja conosco:
+            {t("home.reviews.desc")}
           </p>
         </div>
 

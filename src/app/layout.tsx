@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Manrope } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "../context/LanguageContext";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-display",
@@ -17,16 +18,16 @@ const manrope = Manrope({
 // Metadados da aplicação para SEO
 export const metadata: Metadata = {
   title: "Anderson Executive Transfers | Táxi Executivo & Transfers em São Paulo",
-  description: "Serviço de transporte executivo privado de alto padrão comandado por Anderson Marumoto. Especialista em transfer receptivo de aeroportos (Guarulhos, Congonhas, Viracopos), viagens para litoral e interior, e atendimento corporativo em São Paulo com Toyota Corolla Cross blindado.",
+  description: "Serviço de transporte executivo privado de alto padrão comandado por Anderson Marumoto. Especialista em transfer receptivo de aeroportos (Guarulhos, Congonhas, Viracopos), viagens para litoral e interior, e atendimento corporativo em São Paulo com Toyota Corolla Cross premium.",
   keywords: [
     "transporte executivo", 
     "transfer aeroporto sao paulo", 
     "motorista particular congonhas", 
     "motorista particular guarulhos", 
-    "carro blindado sao paulo", 
+    "carro premium sao paulo", 
     "viagem executiva litoral interior", 
     "Anderson Executive Transfers",
-    "táxi executivo blindado"
+    "táxi executivo premium"
   ],
   authors: [{ name: "Anderson Marumoto" }],
 };
@@ -44,10 +45,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+      </head>
       <body
         className={`${playfairDisplay.variable} ${manrope.variable} antialiased`}
       >
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

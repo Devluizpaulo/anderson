@@ -321,7 +321,7 @@ const Agenda = () => {
   // Link para confirmar corrida com template personalizado de WhatsApp
   const getWhatsappConfirmationLink = (cliente: string, hora: Date, origem: string, destino: string) => {
     const horaStr = new Date(hora).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-    const text = `Olá, ${cliente}! Aqui é o Chauffeur Anderson Marumoto.\n\nPassando para confirmar o nosso transfer executivo agendado para hoje às *${horaStr}*.\n\n📍 *Origem:* ${origem}\n🏁 *Destino:* ${destino}\n\nO Toyota Corolla Cross blindado já está sendo preparado para o trajeto. Qualquer alteração, estou à disposição!`;
+    const text = `Olá, ${cliente}! Aqui é o Chauffeur Anderson Marumoto.\n\nPassando para confirmar o nosso transfer executivo agendado para hoje às *${horaStr}*.\n\n📍 *Origem:* ${origem}\n🏁 *Destino:* ${destino}\n\nO Toyota Corolla Cross premium já está sendo preparado para o trajeto. Qualquer alteração, estou à disposição!`;
     return `https://wa.me/+5511958396939?text=${encodeURIComponent(text)}`;
   };
 
@@ -703,7 +703,7 @@ const Agenda = () => {
                         <div className="flex flex-wrap items-center justify-between gap-3 pt-3.5 border-t border-[#444748]/10 text-xs">
                           <span className="flex items-center gap-1.5 text-[9px] text-secondary bg-secondary/5 px-2.5 py-0.5 rounded border border-secondary/15 uppercase font-bold tracking-wider">
                             <Shield className="w-3.5 h-3.5 text-secondary flex-shrink-0" />
-                            Serviço Corolla Cross Blindado
+                            Serviço Corolla Cross Premium
                           </span>
 
                           <div className="flex items-center gap-2">

@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { FaUser, FaTaxi, FaIdCard, FaBuilding, FaWhatsapp } from "react-icons/fa";
 import { useState } from "react";
+import { useLanguage } from "../context/LanguageContext";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <header className="bg-surface/30 dark:bg-surface/30 backdrop-blur-xl border-b border-secondary/10 fixed top-0 left-0 w-full z-50 shadow-sm font-body">
@@ -54,7 +56,7 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 text-sm font-semibold text-on-surface-variant hover:text-secondary transition-all"
               >
                 <FaUser size={14} />
-                <span>Sobre</span>
+                <span>{t("common.nav.about")}</span>
               </Link>
             </li>
             <li>
@@ -63,7 +65,7 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 text-sm font-semibold text-on-surface-variant hover:text-secondary transition-all"
               >
                 <FaTaxi size={14} />
-                <span>Serviços</span>
+                <span>{t("common.nav.services")}</span>
               </Link>
             </li>
             <li>
@@ -72,7 +74,7 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 text-sm font-semibold text-on-surface-variant hover:text-secondary transition-all"
               >
                 <FaIdCard size={14} />
-                <span>Cartão de Visitas</span>
+                <span>{t("common.nav.card")}</span>
               </Link>
             </li>
             <li>
@@ -81,9 +83,33 @@ const Header: React.FC = () => {
                 className="flex items-center space-x-2 text-sm font-semibold text-on-surface-variant hover:text-secondary transition-all"
               >
                 <FaBuilding size={14} />
-                <span>Dashboard</span>
+                <span>{t("common.nav.dashboard")}</span>
               </Link>
             </li>
+            
+            {/* Mobile Language Selector */}
+            <li className="w-full flex items-center justify-between pt-4 border-t border-[#444748]/10 sm:hidden">
+              <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Idioma / Language</span>
+              <div className="flex items-center space-x-1 bg-white/5 border border-white/10 rounded-full px-2 py-0.5">
+                <button
+                  onClick={() => setLanguage("pt")}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                    language === "pt" ? "bg-secondary text-black" : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  PT
+                </button>
+                <button
+                  onClick={() => setLanguage("en")}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                    language === "en" ? "bg-secondary text-black" : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
+            </li>
+
             <li className="sm:hidden w-full pt-2">
               <a
                 href="https://wa.me/+5511958396939"
@@ -92,14 +118,33 @@ const Header: React.FC = () => {
                 className="flex items-center justify-center space-x-2 w-full py-2.5 px-5 bg-secondary text-black rounded-full font-bold text-xs shadow-md"
               >
                 <FaWhatsapp size={14} />
-                <span>Solicitar Transfer</span>
+                <span>{t("common.nav.cta")}</span>
               </a>
             </li>
           </ul>
         </nav>
 
-        {/* CTA Button (Desktop Only) */}
-        <div className="hidden sm:block">
+        {/* CTA & Language Selector (Desktop Only) */}
+        <div className="hidden sm:flex items-center space-x-4">
+          <div className="flex items-center space-x-1 bg-white/5 border border-white/10 rounded-full px-2.5 py-1">
+            <button
+              onClick={() => setLanguage("pt")}
+              className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider transition-all ${
+                language === "pt" ? "bg-secondary text-black" : "text-gray-400 hover:text-white"
+              }`}
+            >
+              PT
+            </button>
+            <button
+              onClick={() => setLanguage("en")}
+              className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider transition-all ${
+                language === "en" ? "bg-secondary text-black" : "text-gray-400 hover:text-white"
+              }`}
+            >
+              EN
+            </button>
+          </div>
+          
           <a
             href="https://wa.me/+5511958396939"
             target="_blank"
@@ -107,7 +152,7 @@ const Header: React.FC = () => {
             className="flex items-center space-x-2 py-2 px-5 bg-secondary text-black rounded-full font-bold text-xs tracking-wider uppercase shadow-lg shadow-secondary/10 hover:shadow-secondary/20 hover:bg-secondary/90 transform transition duration-300 hover:scale-105"
           >
             <FaWhatsapp size={14} />
-            <span>Solicitar Transfer</span>
+            <span>{t("common.nav.cta")}</span>
           </a>
         </div>
       </div>

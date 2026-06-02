@@ -108,9 +108,9 @@ export const WhatsappSimulator: React.FC = React.memo(() => {
                 onChange={(e) => setWhatsappForm({ ...whatsappForm, veiculo: e.target.value })}
                 className="w-full bg-[#0C0F0F] border border-[#444748]/30 rounded-xl px-3.5 py-2.5 text-white text-xs focus:outline-none focus:border-secondary/50 transition"
               >
-                <option value="Toyota Corolla Cross Blindado">Toyota Corolla Cross Blindado (Black Edition)</option>
+                <option value="Toyota Corolla Cross Premium">Toyota Corolla Cross Premium (Black Edition)</option>
                 <option value="Sedan Black Executivo">Sedan Black Executivo Premium</option>
-                <option value="SUV Especial Blindado VIP">SUV Especial Blindado VIP</option>
+                <option value="SUV Especial Executivo VIP">SUV Especial Executivo VIP</option>
               </select>
             </div>
 

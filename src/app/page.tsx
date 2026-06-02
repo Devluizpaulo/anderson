@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Header from "../components/Header";
 import WhatsAppButton from "../components/WhatsAppButton";
 import ReviewSection from "../components/ReviewSection";
 import { FaChevronDown, FaChevronUp, FaWhatsapp } from "react-icons/fa";
+import { useLanguage } from "../context/LanguageContext";
 
 const Home: React.FC = () => {
   // Estado do formulário de orçamento
@@ -18,6 +20,8 @@ const Home: React.FC = () => {
 
   // Estado do FAQ (Accordion)
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+
+  const { language, t } = useLanguage();
 
   // Efeito de revelação no scroll (Scroll Reveal)
   useEffect(() => {
@@ -41,19 +45,32 @@ const Home: React.FC = () => {
   const handleSendOrçamento = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nome || !origem || !destino) {
-      alert("Por favor, preencha os campos obrigatórios (Nome, Origem e Destino).");
+      alert(language === "pt" 
+        ? "Por favor, preencha os campos obrigatórios (Nome, Origem e Destino)." 
+        : "Please fill in the required fields (Name, Pick-up, and Destination)."
+      );
       return;
     }
 
-    const mensagem = `Olá Anderson! Gostaria de solicitar um orçamento de transfer executivo.%0A%0A` +
-      `*Nome do Passageiro:* ${nome}%0A` +
-      `*Serviço:* ${tipoServico}%0A` +
-      `*Origem:* ${origem}%0A` +
-      `*Destino:* ${destino}%0A` +
-      `*Data:* ${data ? new Date(data).toLocaleDateString("pt-BR") : "A combinar"}%0A` +
-      `*Hora:* ${hora || "A combinar"}%0A` +
-      `${observacoes ? `*Observações:* ${observacoes}%0A` : ""}%0A` +
-      `Agradeço desde já!`;
+    const mensagem = language === "pt"
+      ? `Olá Anderson! Gostaria de solicitar um orçamento de transfer executivo.%0A%0A` +
+        `*Nome do Passageiro:* ${nome}%0A` +
+        `*Serviço:* ${tipoServico}%0A` +
+        `*Origem:* ${origem}%0A` +
+        `*Destino:* ${destino}%0A` +
+        `*Data:* ${data ? new Date(data).toLocaleDateString("pt-BR") : "A combinar"}%0A` +
+        `*Hora:* ${hora || "A combinar"}%0A` +
+        `${observacoes ? `*Observações:* ${observacoes}%0A` : ""}%0A` +
+        `Agradeço desde já!`
+      : `Hello Anderson! I would like to request an executive transfer quote.%0A%0A` +
+        `*Passenger Name:* ${nome}%0A` +
+        `*Service:* ${tipoServico}%0A` +
+        `*Pick-up Location:* ${origem}%0A` +
+        `*Drop-off Location:* ${destino}%0A` +
+        `*Date:* ${data ? new Date(data).toLocaleDateString("en-US") : "To be arranged"}%0A` +
+        `*Time:* ${hora || "To be arranged"}%0A` +
+        `${observacoes ? `*Notes:* ${observacoes}%0A` : ""}%0A` +
+        `Thank you!`;
 
     window.open(`https://wa.me/+5511958396939?text=${mensagem}`, "_blank", "noopener,noreferrer");
   };
@@ -62,28 +79,7 @@ const Home: React.FC = () => {
     setActiveFaq(activeFaq === index ? null : index);
   };
 
-  const faqs = [
-    {
-      question: "Como funciona a recepção em aeroportos?",
-      answer: "Nossa recepção é totalmente personalizada (receptivo de desembarque). O motorista aguarda no saguão de desembarque com uma placa de identificação elegante (digital ou física), auxiliando com as bagagens e conduzindo-o com segurança até o veículo blindado.",
-    },
-    {
-      question: "A frota é 100% blindada?",
-      answer: "Sim, operamos exclusivamente com veículos blindados de altíssimo padrão (nível III-A, o máximo permitido por lei para uso civil no Brasil). Isso garante a máxima segurança urbana em todos os percursos.",
-    },
-    {
-      question: "Com quanta antecedência devo fazer meu agendamento?",
-      answer: "Recomendamos realizar o agendamento com pelo menos 12 a 24 horas de antecedência para garantir total disponibilidade e preparação minuciosa de sua viagem. Para transfers de aeroportos imediatos, favor entrar em contato diretamente via telefone no WhatsApp.",
-    },
-    {
-      question: "Quais são as formas de pagamento aceitas?",
-      answer: "Aceitamos Pix, cartões de crédito/débito diretamente no veículo ou faturamento corporativo para empresas cadastradas mediante contrato prévio.",
-    },
-    {
-      question: "Os motoristas são qualificados?",
-      answer: "Sim. Nossos motoristas possuem licença profissional EAR, passam por rigorosos treinamentos de direção defensiva e evasiva de segurança, e estão preparados para oferecer atendimento executivo exemplar, com discrição absoluta e presteza.",
-    }
-  ];
+  const faqs = (t("home.faq.items") || []) as Array<{ question: string; answer: string }>;
 
   return (
     <div className="font-body bg-[#0C0F0F] text-[#e2e2e2] antialiased selection:bg-secondary selection:text-black min-h-screen pb-20 md:pb-0">
@@ -94,25 +90,25 @@ const Home: React.FC = () => {
         <div className="absolute inset-0 z-0">
           <img
             alt="Executive Car at Night"
-            className="w-full h-full object-cover scale-105 transition-transform duration-10000"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaAKk4xRdj8mVnNqsjym4BHUYfMnZ9bO1UAViWohfybSUmTEZSfEPZ8cRXxMslqn8tslHJP7CPr2kXClaXbOCw-itb8bgggSISWHGcGVadHje-hEGzj9GIdYd_UxupDHwlG_L7zq7pmj1PKk0kRVZZxFyhImVCVx2DLcn17QvVE-UxseR5rUUgizVpO7zpPTJjGeNKTajxbKANu64jWPcIXbCU6qE66W5eLP3B_97IlM25w9bVGtKFuXRrHf5FkcYZftuYj2xbAHA"
+            className="w-full h-full object-cover scale-100 transition-transform duration-10000"
+            src="/hero.png"
           />
           <div className="absolute inset-0 hero-gradient"></div>
         </div>
         <div className="relative z-10 px-6 md:px-16 max-w-container-max mx-auto w-full">
           <div className="max-w-3xl reveal active">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white mb-6 leading-tight">
-              Mobilidade Executiva com Atendimento Personalizado
+              {t("home.hero.title")}
             </h1>
             <p className="text-lg sm:text-xl text-[#c4c7c7] mb-10 max-w-xl leading-relaxed">
-              Mais do que uma corrida. Uma experiência completa de transporte executivo em São Paulo, focada em pontualidade, discrição e segurança absoluta.
+              {t("home.hero.subtitle")}
             </p>
             <div className="flex flex-wrap gap-4">
               <a
                 href="#orcamento"
                 className="bg-secondary text-black px-8 py-4 rounded-full font-semibold text-sm hover:scale-105 transition-transform text-center"
               >
-                Solicitar Atendimento
+                {t("home.hero.ctaRequest")}
               </a>
               <a
                 href="https://wa.me/+5511958396939"
@@ -121,7 +117,7 @@ const Home: React.FC = () => {
                 className="border border-secondary text-secondary px-8 py-4 rounded-full font-semibold text-sm hover:bg-secondary/10 transition-colors text-center flex items-center justify-center gap-2"
               >
                 <FaWhatsapp className="text-lg" />
-                Falar no WhatsApp
+                {t("home.hero.ctaTalk")}
               </a>
             </div>
           </div>
@@ -134,19 +130,19 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-secondary">schedule</span>
-              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">DISPONÍVEL 24H</span>
+              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">{t("home.ribbon.available24h")}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-secondary">flight_takeoff</span>
-              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">AEROPORTOS</span>
+              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">{t("home.ribbon.airports")}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-secondary">business</span>
-              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">CORPORATIVO</span>
+              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">{t("home.ribbon.corporate")}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-secondary">verified_user</span>
-              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">CHAUFFEUR PRIVADO</span>
+              <span className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">{t("home.ribbon.chauffeur")}</span>
             </div>
           </div>
         </div>
@@ -160,24 +156,24 @@ const Home: React.FC = () => {
               <img
                 alt="Anderson Marumoto Profile"
                 className="w-full h-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcPoa9LVsKkg4gx5eyc01DyOwEcW8QXwlJ_kbQpbE_vm0vI0z3NrK-AAJdfgOf5SWB0OiY1X2QSFzC1ivp5L22Y4VFudVeOqhhf_UAxhPdLiF8Vl8iOhTt1a4g1eeSQSWGqL6schVo75LWu0xyrAjzC7S3528v3wtMABoHx2_qWZQNkQLeKjM9KM2hqW8kQYIOz4D5GA9J5gn2ECo-nVWUF9ZmZQR-dT-juHkoeeqIl9_4vqAnLnz27UowkNdrPltxIBk6YLou0R4"
+                src="perfil.png"
               />
             </div>
             <div className="absolute -bottom-6 -right-6 glass-card p-8 rounded-xl hidden md:block">
               <div className="text-secondary font-display text-4xl font-bold">15+</div>
-              <div className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">Anos de Experiência</div>
+              <div className="text-xs font-bold tracking-widest text-[#c4c7c7] uppercase">{t("home.bio.experienceYears")}</div>
             </div>
           </div>
           <div className="reveal" style={{ transitionDelay: "200ms" }}>
-            <span className="text-secondary text-xs font-bold tracking-[0.2em] mb-4 block uppercase">EXCELÊNCIA & COMPROMISSO</span>
-            <h2 className="font-display text-3xl sm:text-4xl text-white mb-6">Conheça Anderson Marumoto</h2>
+            <span className="text-secondary text-xs font-bold tracking-[0.2em] mb-4 block uppercase">{t("home.bio.badgeTitle")}</span>
+            <h2 className="font-display text-3xl sm:text-4xl text-white mb-6">{t("home.bio.title")}</h2>
             <p className="text-[#c4c7c7] mb-6 leading-relaxed text-justify">
-              Como especialista em mobilidade urbana de alto padrão, dedico minha carreira a oferecer mais que transporte: ofereço tranquilidade. Cada jornada é planejada meticulosamente para atender aos padrões mais exigentes de executivos e empresas.
+              {t("home.bio.p1")}
             </p>
             <p className="text-[#c4c7c7] mb-8 leading-relaxed text-justify">
-              Meu compromisso é com a discrição absoluta, o conforto inigualável e uma pontualidade que respeita o valor do seu tempo.
+              {t("home.bio.p2")}
             </p>
-            <div className="font-display text-2xl text-secondary/80 italic">Anderson Marumoto</div>
+            <div className="font-display text-2xl text-secondary/80 italic">{t("home.bio.name")}</div>
           </div>
         </div>
       </section>
@@ -186,7 +182,7 @@ const Home: React.FC = () => {
       <section className="py-24 bg-[#0A0A0A] border-t border-[#444748]/10">
         <div className="px-6 md:px-16 max-w-container-max mx-auto">
           <div className="text-center mb-16 reveal">
-            <h2 className="font-display text-3xl sm:text-4xl text-white mb-4">Serviços Premium</h2>
+            <h2 className="font-display text-3xl sm:text-4xl text-white mb-4">{t("home.services.title")}</h2>
             <div className="w-20 h-1 bg-secondary mx-auto"></div>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -196,38 +192,50 @@ const Home: React.FC = () => {
                 <img
                   alt="Airport Transfer Service"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHpDcloQBCbVBYDVgSf9-ZKEpDSQH6jlrDhX3H2d1xN6veEVbGjqrOw0gYUgd5bZkxNEKqJv15fX9R7_OYwMw0igxvkZnMqndWEUZieI61ke2lcMLJpmNr-d0feI7TnHQtiVnRhqY-DrqEOW8Gm2TLwxUbQAKvs7c4ZsLtMCfCth1NBLpH8GsHDks_PPVlior0NTL5zcE1zL8UEvlNJguTVwEgH0GJhDnJxWWPgZVULY5OnGT8MujDwBdCjrECXQCPjttmg5CGY-E"
+                  src="/airport-transfer.png"
                 />
               </div>
               <div className="p-8">
-                <h3 className="font-display text-xl font-bold text-white mb-4">Transfer Aeroportos</h3>
-                <p className="text-[#c4c7c7] mb-6 text-sm">Recepção personalizada em GRU, CGH e VCP com monitoramento de voos em tempo real.</p>
+                <h3 className="font-display text-xl font-bold text-white mb-4">{t("home.services.transfer.title")}</h3>
+                <p className="text-[#c4c7c7] mb-6 text-sm">{t("home.services.transfer.desc")}</p>
                 <a className="text-secondary font-semibold text-xs tracking-wider uppercase flex items-center gap-2 hover:gap-4 transition-all" href="#orcamento">
-                  SOLICITAR <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                  {t("home.services.transfer.cta")} <span className="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
               </div>
             </div>
             {/* Service 2 */}
-            <div className="glass-card rounded-2xl p-8 flex flex-col justify-between reveal" style={{ transitionDelay: "100ms" }}>
-              <div>
-                <span className="material-symbols-outlined text-4xl text-secondary mb-6">apartment</span>
-                <h3 className="font-display text-xl font-bold text-white mb-4">Atendimento Corporativo</h3>
-                <p className="text-[#c4c7c7] text-sm">Soluções de faturamento e logística coordenada para CEOs e delegações empresariais.</p>
+            <div className="glass-card rounded-2xl overflow-hidden group reveal" style={{ transitionDelay: "100ms" }}>
+              <div className="h-64 overflow-hidden relative">
+                <img
+                  alt="Corporate Chauffeur Service"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  src="/executive.png"
+                />
               </div>
-              <a className="text-secondary font-semibold text-xs tracking-wider uppercase mt-8 flex items-center gap-2 hover:gap-4 transition-all" href="#orcamento">
-                CONTRATAR <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </a>
+              <div className="p-8">
+                <h3 className="font-display text-xl font-bold text-white mb-4">{t("home.services.corporate.title")}</h3>
+                <p className="text-[#c4c7c7] mb-6 text-sm">{t("home.services.corporate.desc")}</p>
+                <a className="text-secondary font-semibold text-xs tracking-wider uppercase flex items-center gap-2 hover:gap-4 transition-all" href="#orcamento">
+                  {t("home.services.corporate.cta")} <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+              </div>
             </div>
             {/* Service 3 */}
-            <div className="glass-card rounded-2xl p-8 flex flex-col justify-between reveal" style={{ transitionDelay: "200ms" }}>
-              <div>
-                <span className="material-symbols-outlined text-4xl text-secondary mb-6">event_seat</span>
-                <h3 className="font-display text-xl font-bold text-white mb-4">Viagens & Eventos</h3>
-                <p className="text-[#c4c7c7] text-sm">Suporte logístico elegante para trajetos ao interior/litoral e eventos de alto padrão.</p>
+            <div className="glass-card rounded-2xl overflow-hidden group reveal" style={{ transitionDelay: "200ms" }}>
+              <div className="h-64 overflow-hidden relative">
+                <img
+                  alt="Trips & Events Service"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  src="/beach-travel.png"
+                />
               </div>
-              <a className="text-secondary font-semibold text-xs tracking-wider uppercase mt-8 flex items-center gap-2 hover:gap-4 transition-all" href="#orcamento">
-                RESERVAR <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </a>
+              <div className="p-8">
+                <h3 className="font-display text-xl font-bold text-white mb-4">{t("home.services.events.title")}</h3>
+                <p className="text-[#c4c7c7] mb-6 text-sm">{t("home.services.events.desc")}</p>
+                <a className="text-secondary font-semibold text-xs tracking-wider uppercase flex items-center gap-2 hover:gap-4 transition-all" href="#orcamento">
+                  {t("home.services.events.cta")} <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -237,45 +245,45 @@ const Home: React.FC = () => {
       <section className="py-24 px-6 md:px-16 max-w-container-max mx-auto">
         <div className="grid md:grid-cols-4 gap-8">
           <div className="md:col-span-2 reveal">
-            <h2 className="font-display text-3xl sm:text-4xl text-white mb-6">O Diferencial de um Serviço Executivo Real</h2>
-            <p className="text-[#c4c7c7] mb-10 leading-relaxed">Não somos apenas motoristas. Somos parceiros da sua agenda e protetores da sua produtividade.</p>
+            <h2 className="font-display text-3xl sm:text-4xl text-white mb-6">{t("home.differentials.title")}</h2>
+            <p className="text-[#c4c7c7] mb-10 leading-relaxed">{t("home.differentials.subtitle")}</p>
             <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <span className="material-symbols-outlined text-secondary">verified</span>
-                <span className="text-white font-semibold">Pontualidade Britânica</span>
+                <span className="text-white font-semibold">{t("home.differentials.punctuality")}</span>
               </div>
               <div className="flex flex-col gap-2">
                 <span className="material-symbols-outlined text-secondary">lock</span>
-                <span className="text-white font-semibold">Sigilo Total</span>
+                <span className="text-white font-semibold">{t("home.differentials.secrecy")}</span>
               </div>
               <div className="flex flex-col gap-2">
                 <span className="material-symbols-outlined text-secondary">shield</span>
-                <span className="text-white font-semibold">Segurança Blindada III-A</span>
+                <span className="text-white font-semibold">{t("home.differentials.armored")}</span>
               </div>
               <div className="flex flex-col gap-2">
                 <span className="material-symbols-outlined text-secondary">language</span>
-                <span className="text-white font-semibold">Atendimento Tailored</span>
+                <span className="text-white font-semibold">{t("home.differentials.tailored")}</span>
               </div>
             </div>
           </div>
           <div className="md:col-span-2 glass-card p-12 rounded-3xl reveal" style={{ transitionDelay: "300ms" }}>
-            <h3 className="font-display text-xl font-bold text-secondary mb-8">Facilidades Corporativas</h3>
+            <h3 className="font-display text-xl font-bold text-secondary mb-8">{t("home.differentials.facilities.title")}</h3>
             <ul className="space-y-6">
               <li className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-secondary">check_circle</span>
-                <span className="text-[#e2e2e2] text-sm md:text-base">Faturamento mensal para empresas (PJ)</span>
+                <span className="text-[#e2e2e2] text-sm md:text-base">{t("home.differentials.facilities.billing")}</span>
               </li>
               <li className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-secondary">check_circle</span>
-                <span className="text-[#e2e2e2] text-sm md:text-base">Recepção personalizada no desembarque</span>
+                <span className="text-[#e2e2e2] text-sm md:text-base">{t("home.differentials.facilities.reception")}</span>
               </li>
               <li className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-secondary">check_circle</span>
-                <span className="text-[#e2e2e2] text-sm md:text-base">Wi-fi de alta velocidade 5G a bordo</span>
+                <span className="text-[#e2e2e2] text-sm md:text-base">{t("home.differentials.facilities.wifi")}</span>
               </li>
               <li className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-secondary">check_circle</span>
-                <span className="text-[#e2e2e2] text-sm md:text-base">Suporte em Inglês e Espanhol para multinacionais</span>
+                <span className="text-[#e2e2e2] text-sm md:text-base">{t("home.differentials.facilities.languages")}</span>
               </li>
             </ul>
           </div>
@@ -288,34 +296,34 @@ const Home: React.FC = () => {
           <img
             alt="Executive Car Interior Detail"
             className="w-full h-full object-cover opacity-20"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfECOPGqOHQIDtTTv5c4U6Dq3mEI24DQz0Ha7hmx-SzMEpDk3RFG0UKpsATl1jrx076V6E3I7pDhnfPpFZn_6z9u2Onfa-PVzA2sXuj79Plw3-6f0FMsWXaJ_2ER16RILDXoAf1WKMbd31--7Z1cIkVbeEPHi7WkdGGkrrGcTMAMb3-796LcBydKv1DoAwTff7dib1tB6LlTLJqrAxtd5otGzKhtSDa1c-HeFvfSN3ZTeEc8CcbWiXiUsqe-A5xtU16Cc0qKq2LZY"
+            src="/executive.png"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0C0F0F] via-transparent to-[#0C0F0F]"></div>
         </div>
         <div className="relative z-10 px-6 md:px-16 max-w-container-max mx-auto">
           <div className="max-w-xl reveal">
-            <span className="text-secondary text-xs font-bold tracking-[0.2em] mb-4 block uppercase">A BORDO</span>
-            <h2 className="font-display text-3xl sm:text-4xl text-white mb-8">Seu Escritório Móvel</h2>
+            <span className="text-secondary text-xs font-bold tracking-[0.2em] mb-4 block uppercase">{t("home.cabin.badge")}</span>
+            <h2 className="font-display text-3xl sm:text-4xl text-white mb-8">{t("home.cabin.title")}</h2>
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-2">
                 <span className="material-symbols-outlined text-secondary">water_full</span>
-                <h4 className="text-white font-bold text-sm sm:text-base">Água & Snacks</h4>
-                <p className="text-[#c4c7c7] text-xs sm:text-sm">Cortesias premium sempre disponíveis.</p>
+                <h4 className="text-white font-bold text-sm sm:text-base">{t("home.cabin.water.title")}</h4>
+                <p className="text-[#c4c7c7] text-xs sm:text-sm">{t("home.cabin.water.desc")}</p>
               </div>
               <div className="space-y-2">
                 <span className="material-symbols-outlined text-secondary">battery_charging_full</span>
-                <h4 className="text-white font-bold text-sm sm:text-base">Conectividade</h4>
-                <p className="text-[#c4c7c7] text-xs sm:text-sm">Cabos para todos os modelos de smartphone.</p>
+                <h4 className="text-white font-bold text-sm sm:text-base">{t("home.cabin.connectivity.title")}</h4>
+                <p className="text-[#c4c7c7] text-xs sm:text-sm">{t("home.cabin.connectivity.desc")}</p>
               </div>
               <div className="space-y-2">
                 <span className="material-symbols-outlined text-secondary">ac_unit</span>
-                <h4 className="text-white font-bold text-sm sm:text-base">Climatização</h4>
-                <p className="text-[#c4c7c7] text-xs sm:text-sm">Controle dual-zone para seu total conforto.</p>
+                <h4 className="text-white font-bold text-sm sm:text-base">{t("home.cabin.climate.title")}</h4>
+                <p className="text-[#c4c7c7] text-xs sm:text-sm">{t("home.cabin.climate.desc")}</p>
               </div>
               <div className="space-y-2">
                 <span className="material-symbols-outlined text-secondary">luggage</span>
-                <h4 className="text-white font-bold text-sm sm:text-base">Amplo Espaço</h4>
-                <p className="text-[#c4c7c7] text-xs sm:text-sm">Capacidade generosa para malas e equipamentos.</p>
+                <h4 className="text-white font-bold text-sm sm:text-base">{t("home.cabin.space.title")}</h4>
+                <p className="text-[#c4c7c7] text-xs sm:text-sm">{t("home.cabin.space.desc")}</p>
               </div>
             </div>
           </div>
@@ -331,26 +339,26 @@ const Home: React.FC = () => {
             <div className="w-full lg:w-1/2 space-y-6 reveal">
               <span className="text-xs uppercase font-extrabold text-secondary tracking-widest bg-secondary/10 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-xs">calculate</span>
-                Orçamento Rápido
+                {t("home.quote.badge")}
               </span>
               <h2 className="font-display text-3xl sm:text-4xl text-white tracking-tight leading-tight">
-                Planeje Sua Viagem no WhatsApp
+                {t("home.quote.title")}
               </h2>
               <p className="text-[#c4c7c7] text-base leading-relaxed text-justify">
-                Preencha os dados do percurso abaixo para calcular e simular a sua rota executiva. Suas informações serão organizadas em uma mensagem automática profissional, pronta para ser enviada diretamente para o nosso atendimento rápido via WhatsApp.
+                {t("home.quote.desc")}
               </p>
               <ul className="space-y-3 text-sm text-[#c4c7c7]">
                 <li className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-secondary" />
-                  Orçamentos sem compromisso e respostas em menos de 10 minutos.
+                  {t("home.quote.benefit1")}
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-secondary" />
-                  Confirmação instantânea de disponibilidade para agendamentos.
+                  {t("home.quote.benefit2")}
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-secondary" />
-                  Facilidade para ajustar percurso e horários no pós-reserva.
+                  {t("home.quote.benefit3")}
                 </li>
               </ul>
             </div>
@@ -359,11 +367,11 @@ const Home: React.FC = () => {
             <div className="w-full lg:w-1/2 glass-card rounded-3xl p-6 sm:p-10 shadow-2xl relative z-10 reveal" style={{ transitionDelay: "200ms" }}>
               <form onSubmit={handleSendOrçamento} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">Seu Nome *</label>
+                  <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">{t("home.quote.form.name")}</label>
                   <input
                     type="text"
                     required
-                    placeholder="Ex: Carlos Oliveira"
+                    placeholder={t("home.quote.form.namePlaceholder")}
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     className="w-full bg-[#0C0F0F] border border-[#444748]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-secondary/50 transition"
@@ -371,37 +379,37 @@ const Home: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">Tipo de Atendimento</label>
+                  <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">{t("home.quote.form.service")}</label>
                   <select
                     value={tipoServico}
                     onChange={(e) => setTipoServico(e.target.value)}
                     className="w-full bg-[#0C0F0F] border border-[#444748]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-secondary/50 transition cursor-pointer"
                   >
-                    <option value="Transfer Aeroporto">Transfer Aeroporto (Receptivo)</option>
-                    <option value="Viagem Litoral/Interior">Viagem Litoral ou Interior</option>
-                    <option value="Atendimento Executivo">Atendimento Corporativo / Reuniões</option>
-                    <option value="City Tour / Turismo">City Tour / Turismo em SP</option>
+                    <option value="Transfer Aeroporto">{t("home.quote.form.serviceOptions.airport")}</option>
+                    <option value="Viagem Litoral/Interior">{t("home.quote.form.serviceOptions.travel")}</option>
+                    <option value="Atendimento Executivo">{t("home.quote.form.serviceOptions.executive")}</option>
+                    <option value="City Tour / Turismo">{t("home.quote.form.serviceOptions.tour")}</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">Local de Partida (Origem) *</label>
+                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">{t("home.quote.form.origin")}</label>
                     <input
                       type="text"
                       required
-                      placeholder="Ex: Aeroporto Guarulhos T3"
+                      placeholder={t("home.quote.form.originPlaceholder")}
                       value={origem}
                       onChange={(e) => setOrigem(e.target.value)}
                       className="w-full bg-[#0C0F0F] border border-[#444748]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-secondary/50 transition"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">Local de Chegada (Destino) *</label>
+                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">{t("home.quote.form.dest")}</label>
                     <input
                       type="text"
                       required
-                      placeholder="Ex: Av. Faria Lima, Pinheiros"
+                      placeholder={t("home.quote.form.destPlaceholder")}
                       value={destino}
                       onChange={(e) => setDestino(e.target.value)}
                       className="w-full bg-[#0C0F0F] border border-[#444748]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-secondary/50 transition"
@@ -411,7 +419,7 @@ const Home: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">Data Desejada</label>
+                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">{t("home.quote.form.date")}</label>
                     <input
                       type="date"
                       value={data}
@@ -420,7 +428,7 @@ const Home: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">Horário</label>
+                    <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">{t("home.quote.form.time")}</label>
                     <input
                       type="time"
                       value={hora}
@@ -431,10 +439,10 @@ const Home: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">Observações do Passageiro</label>
+                  <label className="text-xs font-bold text-[#c4c7c7] uppercase tracking-wider">{t("home.quote.form.notes")}</label>
                   <textarea
                     rows={2}
-                    placeholder="Ex: Preciso de faturamento PJ / Voo atrasado..."
+                    placeholder={t("home.quote.form.notesPlaceholder")}
                     value={observacoes}
                     onChange={(e) => setObservacoes(e.target.value)}
                     className="w-full bg-[#0C0F0F] border border-[#444748]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-secondary/50 transition resize-none"
@@ -446,7 +454,7 @@ const Home: React.FC = () => {
                   className="w-full py-4 bg-secondary text-black font-bold tracking-wide uppercase text-xs rounded-xl shadow-lg shadow-secondary/10 hover:shadow-secondary/20 hover:scale-[1.01] transform transition duration-300 flex items-center justify-center gap-2"
                 >
                   <span className="material-symbols-outlined text-sm">chat</span>
-                  Solicitar Orçamento no WhatsApp
+                  {t("home.quote.form.submit")}
                 </button>
               </form>
             </div>
@@ -462,11 +470,11 @@ const Home: React.FC = () => {
         <div className="text-center mb-16">
           <span className="text-xs uppercase font-extrabold text-secondary tracking-widest bg-secondary/10 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
             <span className="material-symbols-outlined text-xs">help</span>
-            Dúvidas Comuns
+            {t("home.faq.badge")}
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl text-white mt-4 mb-6">Perguntas Frequentes</h2>
+          <h2 className="font-display text-3xl sm:text-4xl text-white mt-4 mb-6">{t("home.faq.title")}</h2>
           <p className="text-[#c4c7c7] text-base leading-relaxed">
-            Esclareça as dúvidas mais recorrentes sobre nosso serviço de transfer privativo.
+            {t("home.faq.desc")}
           </p>
         </div>
 
@@ -506,22 +514,22 @@ const Home: React.FC = () => {
         <div className="max-w-container-max mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
-              <div className="font-display text-2xl text-secondary mb-6 tracking-widest uppercase">ANDERSON MARUMOTO</div>
+              <div className="font-display text-2xl text-secondary mb-6 tracking-widest uppercase">{t("common.footer.title")}</div>
               <p className="text-[#c4c7c7] text-sm mb-8 max-w-sm leading-relaxed text-justify">
-                Elevando o padrão da mobilidade executiva em São Paulo através de excelência operacional, discrição absoluta e segurança inigualável.
+                {t("common.footer.description")}
               </p>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-6 text-sm uppercase tracking-wider">Links Rápidos</h4>
+              <h4 className="text-white font-bold mb-6 text-sm uppercase tracking-wider">{t("common.footer.linksTitle")}</h4>
               <ul className="space-y-4 text-[#c4c7c7] text-sm">
-                <li><a className="hover:text-secondary transition-colors" href="/sobre">Sobre</a></li>
-                <li><a className="hover:text-secondary transition-colors" href="/services">Serviços</a></li>
-                <li><a className="hover:text-secondary transition-colors" href="/CVisita">Cartão de Visitas</a></li>
-                <li><a className="hover:text-secondary transition-colors" href="/dashboard">Dashboard</a></li>
+                <li><Link className="hover:text-secondary transition-colors" href="/sobre">{t("common.nav.about")}</Link></li>
+                <li><Link className="hover:text-secondary transition-colors" href="/services">{t("common.nav.services")}</Link></li>
+                <li><Link className="hover:text-secondary transition-colors" href="/CVisita">{t("common.nav.card")}</Link></li>
+                <li><Link className="hover:text-secondary transition-colors" href="/dashboard">{t("common.nav.dashboard")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-6 text-sm uppercase tracking-wider">Atendimento</h4>
+              <h4 className="text-white font-bold mb-6 text-sm uppercase tracking-wider">{t("common.footer.contactTitle")}</h4>
               <ul className="space-y-4 text-[#c4c7c7] text-sm">
                 <li className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-sm text-secondary">call</span>
@@ -535,8 +543,8 @@ const Home: React.FC = () => {
             </div>
           </div>
           <div className="mt-16 pt-8 border-t border-[#444748]/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[#c4c7c7]">
-            <p>© {new Date().getFullYear()} Anderson Marumoto Executive Chauffeur. Todos os direitos reservados.</p>
-            <p className="text-gray-600">Serviços de transporte privado de passageiros operando sob as mais rígidas regulamentações vigentes.</p>
+            <p>{t("common.footer.rights").replace("{year}", new Date().getFullYear().toString())}</p>
+            <p className="text-gray-600">{t("common.footer.regulation")}</p>
           </div>
         </div>
       </footer>
@@ -549,7 +557,7 @@ const Home: React.FC = () => {
             className="bg-secondary text-black rounded-full px-6 py-2.5 flex items-center gap-2 active:scale-95 transition-all font-semibold text-xs uppercase"
           >
             <span className="material-symbols-outlined text-sm">phone_in_talk</span>
-            <span>Solicitar</span>
+            <span>{t("home.mobileNav.request")}</span>
           </a>
           <a
             href="https://wa.me/+5511958396939"
@@ -558,7 +566,7 @@ const Home: React.FC = () => {
             className="text-[#c4c7c7] flex items-center gap-2 active:scale-95 transition-all font-semibold text-xs uppercase"
           >
             <span className="material-symbols-outlined text-sm">chat</span>
-            <span>Consultar</span>
+            <span>{t("home.mobileNav.consult")}</span>
           </a>
         </div>
       </nav>

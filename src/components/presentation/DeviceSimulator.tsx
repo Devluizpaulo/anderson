@@ -184,7 +184,7 @@ export const DeviceSimulator: React.FC = React.memo(() => {
                 <div className="glass-card p-4 rounded-2xl border border-secondary/10 space-y-2">
                   <h6 className="text-[10px] font-bold text-secondary uppercase tracking-wider">Perfil Profissional</h6>
                   <p className="text-[10px] text-gray-300 leading-relaxed text-justify">
-                    Anderson Marumoto é motorista bilíngue altamente especializado em transporte executivo particular e transfer corporativo em São Paulo, atuando com frota blindada premium.
+                    Anderson Marumoto é motorista bilíngue altamente especializado em transporte executivo particular e transfer corporativo em São Paulo, atuando com frota executiva premium.
                   </p>
                 </div>
 
@@ -194,8 +194,8 @@ export const DeviceSimulator: React.FC = React.memo(() => {
                   
                   <div className="space-y-2 text-[10px]">
                     <div className="flex items-center gap-2 text-gray-300">
-                      <span className="material-symbols-outlined text-secondary text-xs">shield</span>
-                      <span>Toyota Corolla Cross Blindado</span>
+                      <span className="material-symbols-outlined text-secondary text-xs">directions_car</span>
+                      <span>Toyota Corolla Cross Premium</span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-300">
                       <span className="material-symbols-outlined text-secondary text-xs">check_circle</span>
@@ -246,7 +246,7 @@ export const DeviceSimulator: React.FC = React.memo(() => {
                       </div>
                     </div>
                     <p className="text-[10px] text-[#c4c7c7] italic leading-relaxed">
-                      &ldquo;Excelente serviço de receptivo em Guarulhos. Discrição total e carro blindado muito confortável.&rdquo;
+                      &ldquo;Excelente serviço de receptivo em Guarulhos. Discrição total e carro premium muito confortável.&rdquo;
                     </p>
                   </div>
                 </div>
